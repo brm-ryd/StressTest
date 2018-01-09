@@ -1,6 +1,5 @@
 #define ETHERNET_ACCESS_DETAILS
 
-
 #include "stresstest.h"
 #include "logman.h"
 #include <pcap.h>
@@ -22,7 +21,7 @@ void ifprint(pcap_if_t *, int num);
 
 void processExceptionInSnifferThread(Exception* e) {
 	e -> format();
-	printf(ERROR_MESSAGE_FORMAT, e -> get_message());	
+	printf(ERROR_MESSAGE_FORMAT, e -> get_message());
 	delete e;
 	raise(SIGINT);
 }
@@ -52,7 +51,7 @@ const string UDPDevice :: name("udp");
                Class Network
 ******************************************************/
 
-Network :: Network() {   
+Network :: Network() {
    safeTerm = false;
 }
 
@@ -113,7 +112,7 @@ void Interface :: stopTraceSafely() {
    TerminationConditions cond = getTerminationConditions();
 
    switch (cond) {
-      
+
       case TC_ANY:
          stopTraceInt();
          break;
@@ -147,14 +146,14 @@ void Interface :: stopTraceSafely() {
             if (!isTracingCurrently())
                break;
          }
-         
+
          if (cond == TC_REQUEST_THEN_STOP){
             stopTraceInt();
             break;
          }
 
          stop_thread();
-         
+
       default: Test();
    }
 }
@@ -164,7 +163,7 @@ void Network :: stopAllTrace() {
    for (int i = 0; i < numOpenedInterfaces(); i++) {
       interf[i] -> setRequestToBreakTrace();
    }
-   if (safeTerm) {      
+   if (safeTerm) {
       for (int i = 0; i < numOpenedInterfaces(); i++) {
          interf[i] -> stopTraceSafely();
       }
@@ -178,7 +177,7 @@ void Network :: stopAllTrace() {
 
 ResultOfTracing Interface :: trace(stresstest_packet_handler packet_handler,void* user_data) {
 
-   startTrace();   
+   startTrace();
    ResultOfTracing res = traceInt(packet_handler, user_data);
    stopTrace();
    return res;
@@ -232,7 +231,7 @@ const MString Network :: getNameOfInterface(UInt interfaceNum) {
 	check(interfaceNum < interf.size());
 	return interf.at(interfaceNum) -> getUniqueName();
 //	MString name = interf.at(interfaceNum) -> getName();
-//   MString uName = interf.at(interfaceNum) -> getUniqueName();	
+//   MString uName = interf.at(interfaceNum) -> getUniqueName();
 //	if (!uName.empty()) {
 //		name.append("#");
 //		name.append(uName);
@@ -250,7 +249,7 @@ UInt Network :: getInterfaceNumberByName(const MString& name, bool failOnNotFoun
 			return i;
 		}
 	}
-	
+
 	if (failOnNotFound) {
 		throw new Exception("interface with unique name %s not found : make sure that you have correctly specified unique names (using -d option or somewhat else)", !name);
 	}
@@ -285,7 +284,7 @@ void Interface :: stop_thread () {
 
    //if (i < 3) printf("check3, %i\n",i);
 	if (!isThreading()) return;
-   
+
 	#ifdef WIN32
 	if (!TerminateThread(thread,0)) {
 
@@ -293,16 +292,16 @@ void Interface :: stop_thread () {
 	}
 	#else
 	pthread_cancel(thread);
-	#endif	
+	#endif
 
    thread = 0;
    stopTrace();
-   
+
 }
 
 
 /******************************************************
-               Class EthDevice
+               EthDevice class
 ******************************************************/
 
 void EthDevice :: setPromisc(bool isPromisc) {
@@ -354,12 +353,12 @@ void EthDevice :: init() {
      printf("\nMake sure that WinPcap was installed and run the program with administrator's rights. Usually during installation of WinPcap you can set the flag to load driver on system start-up. It will enable a non-privileged user to use library.\n");
      #else
      printf("\nCan't open device. Try to start by root\n");
-     #endif     
+     #endif
 
 	  try {
 		throw new Exception(errbuf);
 	  }
-	  ADD_TO_ERROR_DESCRIPTION("initializing network : error in call to pcap_findalldevs");	       
+	  ADD_TO_ERROR_DESCRIPTION("initializing network : error in call to pcap_findalldevs");
    }
 
 
@@ -372,7 +371,7 @@ void EthDevice :: init() {
    check(write(file_to_send,"\xd4\xc3\xb2\xa1\x02\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff\x00\x00\x01\x00\x00\x00",
    24)!=-1);*/
 
-	is_inited = true;	
+	is_inited = true;
 }
 
 
@@ -414,7 +413,7 @@ EthInterface :: EthInterface(const MString& devname_t, const EthDevice& device) 
 //               }
 //      }
 
-		// searching the name of interface amoung ip addresses of adapters	
+		// searching the name of interface amoung ip addresses of adapters
 
 		i=0;
 		for (d = EthDeviceCore :: alldevs; d; d = d->next, i++) {
@@ -426,7 +425,7 @@ EthInterface :: EthInterface(const MString& devname_t, const EthDevice& device) 
 			  devname = d -> name;	// copies the real name of this adapter
 			}
 		}
-	
+
 
 	// opening adapter
 
@@ -434,7 +433,7 @@ EthInterface :: EthInterface(const MString& devname_t, const EthDevice& device) 
 
 	//if ( (fp = pcap_open(devname, defaultSanpLen, promisc_mode ? PCAP_OPENFLAG_PROMISCUOUS : 0, 20, Null, errbuf) ) == 0) {
 	if ( (fp = pcap_open_live(!devname, device.defaultSanpLen, device.promisc_mode, 20, errbuf) ) == 0) {
-		
+
 		// fail to open
 		// trying to interpret the name of interface as DNS name
 
@@ -450,7 +449,7 @@ EthInterface :: EthInterface(const MString& devname_t, const EthDevice& device) 
 		}
 
 		char ipAddr[20];
-		sprintf(ipAddr, "%u.%u.%u.%u", 
+		sprintf(ipAddr, "%u.%u.%u.%u",
 			*((uchar*)((*h).h_addr_list[0]) + 0),
 			*((uchar*)((*h).h_addr_list[0]) + 1),
 			*((uchar*)((*h).h_addr_list[0]) + 2),
@@ -474,8 +473,8 @@ EthInterface :: EthInterface(const MString& devname_t, const EthDevice& device) 
 
 			// fail again
 			throw new Exception("opening adapter with user name '%s' : %s", !devname_t, errbuf);
-	} 
-      		
+	}
+
 //	if (num_open_devs >= NET_MAX_DEVS) {
 //
 //		throw new Exception("to many opened devices");
@@ -484,12 +483,12 @@ EthInterface :: EthInterface(const MString& devname_t, const EthDevice& device) 
 //	devices[numOpenedInterfaces()] = fp;
 
 	//register_device_name(num_open_devs, devname_t);
-	
+
 	//num_open_devs++;
 //	set_device_num(num_open_devs - 1, devnum);
-   
-   core = new EthInterfaceCore(this, fp);   
-   
+
+   core = new EthInterfaceCore(this, fp);
+
 //	return num_open_devs;
 }
 
@@ -518,7 +517,7 @@ void EthInterface :: setFilter(char* filterString) {
 
 void EthInterface :: send(const u_char* buf, int size) {
 
-	int i;	
+	int i;
 
 	if (size < EthInterface :: minimalSizeOfPacket)
 		throw new Exception("trying to send too small packet on the channel layer");
@@ -645,8 +644,8 @@ ResultOfTracing EthInterfaceCore :: start_trace_eth(pcap_handler packet_handler,
 
 ResultOfTracing EthInterface :: traceInt (stresstest_packet_handler packet_handler, void* user_data) {
 
-	
-	struct pcap_packet_handler_info info;	
+
+	struct pcap_packet_handler_info info;
 
 	info.handler = packet_handler;
 	info.user_data = user_data;
@@ -708,25 +707,25 @@ void IPDevice :: init () {
 	s = socket(PF_INET, SOCK_RAW, IPPROTO_RAW);
 	if (s == -1) {
 
-		throw new Exception("creating RAW IP socket : %s", strerror(errno));		
+		throw new Exception("creating RAW IP socket : %s", strerror(errno));
 	}
 
 	int hdrinc = 1;
 	if ( setsockopt (s, IPPROTO_IP, IP_HDRINCL, (const char*)&hdrinc, sizeof(hdrinc)) == -1) {
-	
-		throw new Exception("creating socket : setting option 'IP_HDRINCL': %s", strerror(errno));		
+
+		throw new Exception("creating socket : setting option 'IP_HDRINCL': %s", strerror(errno));
 	}
 
-	#if (OS_LINUX == 1)	
+	#if (OS_LINUX == 1)
 	//rs[num_open_devs] = socket(PF_PACKET, SOCK_RAW, htons(0x0800) );
 //	if (rs[num_open_devs] == -1) {
 //
-//		throw new Exception ("creating RAW IP socket : %s", strerror(errno));		
+//		throw new Exception ("creating RAW IP socket : %s", strerror(errno));
 //	}
 //	num_open_devs++;
 	#endif
 
-// is_inited = true;	
+// is_inited = true;
 }
 #endif
 
@@ -738,7 +737,7 @@ IPInterface :: IPInterface(const MString& name) : Interface(name) {
 	hostent* h;
 	sockaddr_in target;
    //int devnum = -1;
-         
+
 //   char* devname = (char*)malloc(strlen(name)+1);
 //	memCheck(devname);
 //	strcpy(devname, name);
@@ -746,7 +745,7 @@ IPInterface :: IPInterface(const MString& name) : Interface(name) {
    SOCKET s;
 
 	try
-	{	
+	{
 //		char* ch = strchr(devname,'#');
 //		if (ch) {
 //
@@ -801,7 +800,7 @@ IPInterface :: IPInterface(const MString& name) : Interface(name) {
 			return -1;
 		} */
 
-		#define SIO_RCVALL  0x98000001	
+		#define SIO_RCVALL  0x98000001
 		DWORD optval = 1;
 		int i;
 		int p = WSAIoctl(s, SIO_RCVALL, &optval, sizeof(optval), 0,0,(ULONG*)&i,0,0);
@@ -816,14 +815,14 @@ IPInterface :: IPInterface(const MString& name) : Interface(name) {
 		//num_open_devs ++;
 //		set_device_num(num_open_devs - 1,devnum);
 
-		//return num_open_devs - 1;	
-      
+		//return num_open_devs - 1;
+
 	}
 	ADD_TO_ERROR_DESCRIPTION2("opening RAW IP interface with user's name '%s'", !name);
-   
-   
+
+
    this -> s = s;
-   
+
 }
 #else
 IPInterface :: IPInterface(const MString& name) : Interface(name) {
@@ -838,7 +837,7 @@ IPInterface :: IPInterface(const MString& name) : Interface(name) {
 	throw new Exception("trying to open ip device : for your OS capturing RAW IP - only globaly (you don't need to specify device)");
 	#else
 	throw new Exception("capturing over RAW IP not supported under your OS");
-	#endif   
+	#endif
 
 
 //	h=gethostbyname(name);
@@ -864,7 +863,7 @@ IPInterface :: IPInterface(const MString& name) : Interface(name) {
 //
 //	if (-1 == bind(rs[num_open_devs], (sockaddr*)&target, sizeof(target))) {
 //
-//		throw new Exception("binding RAW IP socket to address '%s' : %s : make sure it's address of your host",name,strerror(errno));//		
+//		throw new Exception("binding RAW IP socket to address '%s' : %s : make sure it's address of your host",name,strerror(errno));//
 //	}
 
 	//num_open_devs ++;
@@ -899,7 +898,7 @@ void IPInterface :: send (const u_char* b, int size) {
 	wsabuf[0].buf = (char*)b;
 	DWORD send;
 	int res;
-	
+
 	res = WSASendTo (s, wsabuf, 1, &send, 0, (struct sockaddr *)&target, sizeof (target), 0, 0);
 	if (send == 0 && size != send) {
 
@@ -908,7 +907,7 @@ void IPInterface :: send (const u_char* b, int size) {
 
 	if (res == SOCKET_ERROR) {
 
-		int er_code = WSAGetLastError();		
+		int er_code = WSAGetLastError();
 
 		try {
 			switch (er_code) {
@@ -926,8 +925,8 @@ void IPInterface :: send (const u_char* b, int size) {
 					throw new Exception(winerror(WSAGetLastError()));
 			}
 		}
-		ADD_TO_ERROR_DESCRIPTION2("generating RAW IP packet (code = %i)",er_code);		
-	}	
+		ADD_TO_ERROR_DESCRIPTION2("generating RAW IP packet (code = %i)",er_code);
+	}
 }
 #else
 void IPInterface :: send (const u_char* b, int size) {
@@ -957,9 +956,9 @@ void IPInterface :: send (const u_char* b, int size) {
 	int res = sendto(s, b, size, 0,(struct sockaddr *)&target, sizeof (target));
 	if (res == -1) {
 
-		throw new Exception("generating RAW IP packet : %s", strerror(errno));	
+		throw new Exception("generating RAW IP packet : %s", strerror(errno));
 	}
-	
+
 }
 #endif
 
@@ -1024,7 +1023,7 @@ ResultOfTracing IPInterface :: traceInt(stresstest_packet_handler packet_handler
 }
 
 void IPInterface :: stopTraceInt () {
-        
+
 	// close of socket is not good to stop trace
 	#ifdef WIN32
 	//closesocket(rs[interface_num]);
@@ -1052,9 +1051,9 @@ void IPInterface :: stopTraceInt () {
 
 void SocketInterface :: open() {
 
-	const MString name = getName();	
+	const MString name = getName();
 	bool serverMode = false;
-   MString name1 = name;	   
+   MString name1 = name;
 	try
 	{
 		stringstream ss(!name1);
@@ -1063,7 +1062,7 @@ void SocketInterface :: open() {
 		string portString;
 		getline(ss, side, ':');
 		getline(ss, host, ':');
-		getline(ss, portString, ':');			
+		getline(ss, portString, ':');
 		if (side.empty() || host.empty() || portString.empty()) {
 			throw new Exception("incorrect socket interface name (example: client:mail.ru:110 or server:localhost:1000)",!name);
 		}
@@ -1107,7 +1106,7 @@ void SocketInterface :: open() {
 
 SOCKET UDPInterface :: createSocket(sockaddr_in addr, bool serverMode) {
 	SOCKET sock;
-	
+
 	#ifdef WIN32
 	sock = WSASocket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, 0, 0, 0);
 	if (sock == INVALID_SOCKET) {
@@ -1116,7 +1115,7 @@ SOCKET UDPInterface :: createSocket(sockaddr_in addr, bool serverMode) {
 	#else
 	sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (sock == -1) {
-		throw new Exception("creating socket : %s", strerror(errno));      
+		throw new Exception("creating socket : %s", strerror(errno));
 	}
 	#endif
 
@@ -1133,35 +1132,35 @@ SOCKET UDPInterface :: createSocket(sockaddr_in addr, bool serverMode) {
 
 SOCKET TCPInterface :: createSocket(sockaddr_in addr, bool serverMode) {
 	SOCKET sock;
-	
+
 	#ifdef WIN32
 	sock = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, 0);
-			
+
 	if (sock == INVALID_SOCKET) {
 		throw new Exception("creating socket : %s",winerror(WSAGetLastError()));
 	}
 	#else
 	sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (sock == -1) {
-		throw new Exception("creating socket : %s", strerror(errno));      
+		throw new Exception("creating socket : %s", strerror(errno));
 	}
 	#endif
-	
+
 	if (!serverMode) {
 
 		// CLIENT
 
 		#ifdef WIN32
 		if (SOCKET_ERROR == WSAConnect(sock, (sockaddr*)&addr, sizeof(addr), 0, 0, 0, 0)) {
-			throw new ConnectionFailedException("attempt to connection has failed : %s", winerror(WSAGetLastError()));      
+			throw new ConnectionFailedException("attempt to connection has failed : %s", winerror(WSAGetLastError()));
 		}
 		#else
 		if (-1 == connect(sock, (sockaddr*)&addr, sizeof(addr))) {
-			throw new ConnectionFailedException("attempt to connection has failed : %s", strerror(errno));      
+			throw new ConnectionFailedException("attempt to connection has failed : %s", strerror(errno));
 		}
 		#endif
 	}
-	else {		
+	else {
 
 		// SERVER
 
@@ -1216,9 +1215,9 @@ SOCKET TCPInterface :: createSocket(sockaddr_in addr, bool serverMode) {
 			char service[101];
 			if (!getnameinfo((sockaddr*)&addr, sizeof(addr), host, 100, service, 100, NI_NUMERICSERV|NI_NUMERICHOST)) {
 
-				if (!Network :: quiet) printf(" from %s : %s", host, service);				
+				if (!Network :: quiet) printf(" from %s : %s", host, service);
 			}
-			//else printf("%s", winerror(WSAGetLastError()));				
+			//else printf("%s", winerror(WSAGetLastError()));
 		}
 
 		if (!Network :: quiet) printf("\n");
@@ -1246,24 +1245,24 @@ void SocketInterface :: close() {
 }
 
 void UDPInterface :: send(const u_char* buf, int size) {
-	
+
 #ifndef WIN32
    if ( size != :: sendto(s, (char*)buf, size, MSG_NOSIGNAL, (sockaddr*)&remoteAddr, sizeof(remoteAddr))) {
 #else
 	if ( size != :: sendto(s, (char*)buf, size, 0, (sockaddr*)&remoteAddr, sizeof(remoteAddr))) {
-#endif	
-      throw new SendingOverSocketException("sending data over socket connection : %s", SOCKET_ERROR_MESSAGE);    		
+#endif
+      throw new SendingOverSocketException("sending data over socket connection : %s", SOCKET_ERROR_MESSAGE);
    }
 }
 
 void TCPInterface :: send(const u_char* buf, int size) {
-	
+
 #ifndef WIN32
    if ( size != :: send(s, (char*)buf, size, MSG_NOSIGNAL)) {
 #else
 	if ( size != :: send(s, (char*)buf, size, 0)) {
-#endif	
-      throw new SendingOverSocketException("sending data over socket connection : %s", SOCKET_ERROR_MESSAGE);    		
+#endif
+      throw new SendingOverSocketException("sending data over socket connection : %s", SOCKET_ERROR_MESSAGE);
    }
 }
 
@@ -1271,17 +1270,17 @@ void TCPInterface :: send(const u_char* buf, int size) {
 ResultOfTracing SocketInterface :: traceInt(stresstest_packet_handler packet_handler, void* user_data) {
 
    struct timeval tv;
-	fd_set rd_set;   
+	fd_set rd_set;
 	int offset = getDevice() -> getPositionDataBegins();
 
    u_char buf[TCP_RECV_BUF];
-	   
+
 	memset(buf, 0, offset);
-		
+
 	FD_ZERO(&rd_set);
 
    for (;;) {
-		      
+
 		int res;
 
 		// checks is some data ready to read
@@ -1294,7 +1293,7 @@ ResultOfTracing SocketInterface :: traceInt(stresstest_packet_handler packet_han
 			res = select(s + 1, &rd_set, Null, Null, &tv);
 		}
 		else {
-						
+
 			res = select(s + 1, &rd_set, Null, Null, Null);
 		}
 
@@ -1313,7 +1312,7 @@ ResultOfTracing SocketInterface :: traceInt(stresstest_packet_handler packet_han
 		}
 
 		// receiving data
-		
+
 		#ifdef WIN32
       if ( SOCKET_ERROR == (res = :: recv(s, (char*)buf + offset, TCP_RECV_BUF - offset, 0))) {
 
@@ -1342,7 +1341,7 @@ ResultOfTracing SocketInterface :: traceInt(stresstest_packet_handler packet_han
       }
       #endif
 
-      if (res == 0) 
+      if (res == 0)
 			return RT_ERROR;
 
       if (isRequestToBreakTrace()) {
@@ -1354,7 +1353,7 @@ ResultOfTracing SocketInterface :: traceInt(stresstest_packet_handler packet_han
 		if (packet_handler(buf, res + offset, user_data)) {
 
 			return RT_BREAKED;
-		}      
+		}
    }
 
    return RT_BREAKED;
@@ -1362,7 +1361,7 @@ ResultOfTracing SocketInterface :: traceInt(stresstest_packet_handler packet_han
 
 void SocketInterface :: stopTraceInt() {
 
-	
+
    /*#ifdef WIN32
    closesocket(getTcpInterface(interface_num) -> s);
    #else
@@ -1419,7 +1418,7 @@ void pcap_packet_handler (u_char *info, const struct pcap_pkthdr *header,
 				  const u_char *data) {
 
 	try {
-		
+
 	struct pcap_packet_handler_info *st;
 	st = (pcap_packet_handler_info*)info;
 
@@ -1429,7 +1428,7 @@ void pcap_packet_handler (u_char *info, const struct pcap_pkthdr *header,
 	handler = st -> handler;
 
    EthInterface* ethdev = (EthInterface*)st -> interf;
-   
+
    if (st -> interf -> isRequestToBreakTrace()) {
 
 		ADDTOLOG1("pcap_packet_handler -- request for break");
@@ -1443,8 +1442,8 @@ void pcap_packet_handler (u_char *info, const struct pcap_pkthdr *header,
 		ADDTOLOG1("pcap_packet_handler -- breaked by handler");
 		ethdev -> stopTraceInt();
 	}
-	
-	} catch (Exception* e) {		
+
+	} catch (Exception* e) {
 		processExceptionInSnifferThread(e);
 	}
 }
@@ -1458,7 +1457,7 @@ void init_wsa () {
 
 	if (WSAStartup(MAKEWORD(2, 2), &wsadata)) {
 
-	  throw new Exception("system error : initializing WSA : %s", winerror(WSAGetLastError()));	  
-	}	
+	  throw new Exception("system error : initializing WSA : %s", winerror(WSAGetLastError()));
+	}
 }
 #endif
