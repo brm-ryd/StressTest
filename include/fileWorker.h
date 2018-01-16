@@ -4,13 +4,10 @@
 #pragma once
 
 /**
-
 	Base class for all classes to work with files
-
 */
 
 enum AccessToFile {
-
 	AF_READ,
 	AF_WRITE
 };
@@ -20,11 +17,9 @@ class FileWorker : public DBuffer
 {
 
 public:
-
 	MString nameOfLoadedFile;
 
 public:
-
 	FileWorker(void);
 	~FileWorker(void);
 
