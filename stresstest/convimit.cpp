@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "convimit.h"
-#include "myMutex.h"
+#include "mutex.h"
 #include "reqandstat.h"
 //---------------------------------------------------------------------------
 
@@ -13,7 +13,7 @@ void AdaptiveRepmaker :: operator=(const AdaptiveRepmaker& sourceObject) {
 
 	repMakers = sourceObject.repMakers;
 
-	rec = sourceObject.rec;	
+	rec = sourceObject.rec;
 	gen = sourceObject.gen;
 
 //	for (int i = 0; i < numConstraints; i++) {
@@ -102,7 +102,7 @@ u_int AdaptiveRepmaker :: processPacket(u_char* buf, u_int size, u_int group_mas
 	ADDTOLOG1("AdaptiveRepmaker :: setByPacket -- start");
 
 	if (_isSet) {
-	
+
 		ADDTOLOG1("AdaptiveRepmaker :: setByPacket -- already set");
 		return group_mask;
 	}
@@ -115,7 +115,7 @@ u_int AdaptiveRepmaker :: processPacket(u_char* buf, u_int size, u_int group_mas
 
 	if (group_mask & (1 << group)) {
 
-		ADDTOLOG1("AdaptiveRepmaker :: setByPacket -- group is already set");		
+		ADDTOLOG1("AdaptiveRepmaker :: setByPacket -- group is already set");
 		return group_mask;
 	}
 
@@ -158,7 +158,7 @@ int TimeStamp :: operator-(const TimeStamp& t2) const {
 
    int sec = this -> sec - t2.sec;
    int usec = this -> usec - t2.usec;
-	   
+
    if (sec > 1000) sec = 10;
    if (sec < -1000) sec = -10;
 
@@ -182,7 +182,7 @@ void AddVal(void** p, u_int* ar_size, u_int item_size, int step_of_size) {
 
       *ar_size = step_of_size;
       *p = malloc((*ar_size) * item_size);
-      memCheck(*p);      
+      memCheck(*p);
    }
 }
 
@@ -244,14 +244,14 @@ void fixe_bag (u_char* pac, u_char* buf, int size) {
 
 
 ConvImit :: ConvImit() {
-	
+
 	conv_serial = -1;
-   
+
 	device = 0;
 	file = 0;
 
    isWaitInfinity = false;
-   
+
    //repmakers = 0;
  //  numRepmakers = 0;
 
@@ -292,7 +292,7 @@ int ConvImit :: init(TraceFile* tfile) {
 
 
 InteractionControl :: InteractionControl() {
-		
+
 	startPacket = 0;
 
 	status = statusUndefined;
@@ -322,7 +322,7 @@ void InteractionControl :: setFile(TraceFile* externFile) {
 void InteractionControl :: reset() {
 
 	if (file) {
-		
+
 		pointerCurrentPacket = file -> getStartPos();
 		numCurrentPacket = 0;
 
@@ -338,12 +338,12 @@ void InteractionControl :: gotoNextPacket() {
 
    u_int eps_num = numEPs;
 
-   pointerCurrentPacket = 
-		file -> gotoNextEndPoint(pointerCurrentPacket, eps, &eps_num, &sizeCurrentPacket, &numCurrentPacket, &timeCurrentPacket);	
+   pointerCurrentPacket =
+		file -> gotoNextEndPoint(pointerCurrentPacket, eps, &eps_num, &sizeCurrentPacket, &numCurrentPacket, &timeCurrentPacket);
 
    if (!pointerCurrentPacket) return;
 
-   check(sizeCurrentPacket);   
+   check(sizeCurrentPacket);
 
    numInterfaceForCurrentPacket = eps[eps_num].interfaceNum;
 }
@@ -381,17 +381,17 @@ ReceivingControl :: ReceivingControl() {
 
 	arepmakers = 0;
 //	numArepmakers = 0;
-	
+
 	isFirstPacketExpected = true;
-	working = false;	
+	working = false;
 
 	device = 0;
-	sender = 0;	
+	sender = 0;
 }
 
-ReceivingControl :: ~ReceivingControl() { 
-	
-	//if (adaptedBufferExpectedPacket) 
+ReceivingControl :: ~ReceivingControl() {
+
+	//if (adaptedBufferExpectedPacket)
 	//	delete[] adaptedBufferExpectedPacket;
 }
 
@@ -411,17 +411,17 @@ void ReceivingControl :: gotoNextPacket() {
 	isFirstPacketExpected = false;
 
 	if (!pointerCurrentPacket) {
-		
+
 		working = false;
 		return;
 	}
 
-	readyBuffer(pointerCurrentPacket, sizeCurrentPacket);	
+	readyBuffer(pointerCurrentPacket, sizeCurrentPacket);
 }
 bool ReceivingControl :: newPacketReceived(u_char* bufferReceivedPacket, u_int sizeReceivedPacket, int numReceivingInterface) {
 
    u_int comparedSize = (sizeReceivedPacket < sizeCurrentPacket) ? sizeReceivedPacket : sizeCurrentPacket;
-   
+
 	userCheck(sender);
 
 #ifdef SSPT2_BUG
@@ -445,9 +445,9 @@ bool ReceivingControl :: newPacketReceived(u_char* bufferReceivedPacket, u_int s
    if (!pointerCurrentPacket)
 		return false;
 
-	ADDTOLOG3("ReceivingControl :: newPacketReceived -- start, bufferReceivedPacket = \n%s\nbufferCurrentPacket = \n%s", 
+	ADDTOLOG3("ReceivingControl :: newPacketReceived -- start, bufferReceivedPacket = \n%s\nbufferCurrentPacket = \n%s",
 		getStringOfDump(bufferReceivedPacket, comparedSize),getStringOfDump1(bufferCurrentPacket, comparedSize));
-	/*printf("ReceivingControl :: newPacketReceived -- start, bufferReceivedPacket = \n%s\nbufferCurrentPacket = \n%s", 
+	/*printf("ReceivingControl :: newPacketReceived -- start, bufferReceivedPacket = \n%s\nbufferCurrentPacket = \n%s",
 		getStringOfDump(bufferReceivedPacket, comparedSize),getStringOfDump1(bufferCurrentPacket, comparedSize));*/
 
 	for (vector<CommonField> :: iterator i = (*cieves).begin(); i != (*cieves).end(); i++) {
@@ -469,7 +469,7 @@ bool ReceivingControl :: newPacketReceived(u_char* bufferReceivedPacket, u_int s
 
 	for (vector<FieldAdaptiveReplace> :: iterator i = (*arepmakers).begin(); i != (*arepmakers).end(); i++)
 		if (!i -> a.isInitialized()) {
-			
+
          i -> a.applyCieve(bufferReceivedPacket, bufferCurrentPacket, comparedSize, numCurrentPacket);
 			ADDTOLOG2("ReceivingControl :: newPacketReceived -- after appling AdaptiveRepmaker, packet = \n%s",
 				getStringOfDump(bufferCurrentPacket,comparedSize));
@@ -479,14 +479,14 @@ bool ReceivingControl :: newPacketReceived(u_char* bufferReceivedPacket, u_int s
 
    //Cieve(bufferReceivedPacket, comparedSize);
 	ADDTOLOG3("ReceivingControl :: newPacketReceived -- comparing, bufferReceivedPacket = \n%s\nbufferCurrentPacket = \n%s",
-		getStringOfDump(bufferReceivedPacket, comparedSize), 
+		getStringOfDump(bufferReceivedPacket, comparedSize),
 		getStringOfDump1(bufferCurrentPacket, comparedSize)
 		);
-   
+
 	// final compare
 
    if (memcmp(bufferCurrentPacket, bufferReceivedPacket, comparedSize)) {
-            
+
 		// not hit
 
       return false;
@@ -500,7 +500,7 @@ bool ReceivingControl :: newPacketReceived(u_char* bufferReceivedPacket, u_int s
 	printf("received packet %i (interface %i)\n", numCurrentPacket, numReceivingInterface);
 #endif
 
-	printf(".");	
+	printf(".");
 	fflush(stdout);
 
    u_int group_mask = 0;  // !
@@ -518,12 +518,12 @@ bool ReceivingControl :: newPacketReceived(u_char* bufferReceivedPacket, u_int s
 
 
 void ReceivingControl :: reset() {
-		
+
 	pointerLastReceivedPacket = file -> getStartPos();
 
 	working = true;
 	InteractionControl :: reset();
-	isFirstPacketExpected = true;	
+	isFirstPacketExpected = true;
 }
 
 //void ReceivingControl :: cieve(u_char* baseBuf, u_int sizeBaseBuf) {
@@ -548,7 +548,7 @@ SendingControl :: SendingControl() {
 
 	device = 0;
 	timed_mode = false;
-	isWaitInfinity = false;		
+	isWaitInfinity = false;
 
 	receiver = 0;
 
@@ -564,7 +564,7 @@ SendingControl :: SendingControl() {
 //}
 int SendingControl :: generate(const TimeStamp* currentTime) {
 
-   int dif;		
+   int dif;
 
 	userCheck(device);
 	userCheck(receiver);
@@ -580,24 +580,24 @@ int SendingControl :: generate(const TimeStamp* currentTime) {
 			numCurrentPacket = 0x7fffffff;
       }*/
 
-      if (!pointerCurrentPacket || (stopPacket && numCurrentPacket > stopPacket)) {  
+      if (!pointerCurrentPacket || (stopPacket && numCurrentPacket > stopPacket)) {
 
 			// all the packet are generated
 
 			ADDTOLOG1("SendingControl :: generate -- the all packets are generated");
-         
+
 			if (!receiver -> isWaitPackets() || (stopPacket && receiver -> getNumCurrentPacket() > stopPacket)) {
 
 				// all the packets are received
-            
+
 				ADDTOLOG1("SendingControl :: generate -- the all packets are received");
 
             return 0;
          }
-         else {  
-				
+         else {
+
 				// NOT all the packets are received
-				
+
 				ADDTOLOG1("SendingControl :: generate -- not all packets are received");
 
             if (0 == (dif = retransmit(currentTime)))
@@ -616,9 +616,9 @@ int SendingControl :: generate(const TimeStamp* currentTime) {
 		dif = *currentTime - timeCurrentPacket;
 
 		if (timed_mode && dif < 0) {
-             
-			ADDTOLOG1("SendingControl :: generate -- not now");			
-			return -dif;        
+
+			ADDTOLOG1("SendingControl :: generate -- not now");
+			return -dif;
       }
 
 		// check that all the previous packets are received
@@ -626,11 +626,11 @@ int SendingControl :: generate(const TimeStamp* currentTime) {
       if (receiver -> getNumCurrentPacket() < numCurrentPacket) {
 
 			// NOT all the previous packets are received
-			         
+
 			// resend them
 
          if ((dif = retransmit(currentTime)) == 0)
-				
+
 				continue;
 
 			else {
@@ -638,8 +638,8 @@ int SendingControl :: generate(const TimeStamp* currentTime) {
 				ADDTOLOG1("SendingControl :: generate -- instructs to wait timeout");
             return dif;
 			}
-      }      
-		
+      }
+
 #ifdef DEBUG_CONVTEST
 		printf("packet %i generated (interface %i)\n", numCurrentPacket, numInterfaceForCurrentPacket);
 #endif
@@ -652,7 +652,7 @@ int SendingControl :: generate(const TimeStamp* currentTime) {
 		/* at first goes to the next packet
 			so, the current packet will be marked as sent,
 			otherwise (if we sends current packet before the marking it as sent),
-			ReceivingControl may receive this packet before the mark happens, 
+			ReceivingControl may receive this packet before the mark happens,
 			and the packet will be not accepted
 		*/
 		gotoNextPacket();
@@ -660,7 +660,7 @@ int SendingControl :: generate(const TimeStamp* currentTime) {
 		// and now generates the saved previous packet
 		if (prevSizeCurrentPacket < device -> getInterface(prevNumInterfaceForCurrentPacket) -> getMinimalSizeOfPacket())
 			prevSizeCurrentPacket = device -> getInterface(prevNumInterfaceForCurrentPacket) -> getMinimalSizeOfPacket();
-		
+
 		ADDTOLOG3("SendingControl :: generate -- generating, interface = %i, packet = \n%s", prevNumInterfaceForCurrentPacket, getStringOfDump(bufferCurrentPacket, prevSizeCurrentPacket));
 
 		device -> getInterface(prevNumInterfaceForCurrentPacket) -> send(bufferCurrentPacket, prevSizeCurrentPacket);
@@ -668,7 +668,7 @@ int SendingControl :: generate(const TimeStamp* currentTime) {
 		numberOfRetransmitionsOfCurrentPacket = 0;
 
 		timeOfFirstGeneration = *currentTime;
-		timeOfLastGeneration = *currentTime;      
+		timeOfLastGeneration = *currentTime;
    }
 }
 
@@ -689,7 +689,7 @@ int SendingControl :: retransmit(const TimeStamp* currentTime) {
 
    if (timeSinceLastGeneration >= timeout) {
 
-      u_int gen_size1;      
+      u_int gen_size1;
 
 		ADDTOLOG1("SendingControl :: retransmit -- timeout");
 
@@ -704,7 +704,7 @@ int SendingControl :: retransmit(const TimeStamp* currentTime) {
 
 			ADDTOLOG1("SendingControl :: retransmit -- mark as dropped");
 
-#ifdef DEBUG_CONVTEST            
+#ifdef DEBUG_CONVTEST
 			printf("packet %i marked as dropped\n", receiver -> getNumCurrentPacket());
 #endif
 
@@ -715,31 +715,31 @@ int SendingControl :: retransmit(const TimeStamp* currentTime) {
 			#ifndef WIN32
 			fflush(stdout);
 			#endif*/
-         
+
 			// forces the receiver to go to the next packet
          receiver -> gotoNextPacket();
 
-      } else {	  
+      } else {
 
 			// RETRANSMITION
 
 			ADDTOLOG2("SendingControl :: retransmit -- retransmition, receiver packet = %i", receiver -> getNumCurrentPacket());
 
-#ifdef DEBUG_CONVTEST            
+#ifdef DEBUG_CONVTEST
 			printf("start retransmition from packet %i\n", receiver -> getNumCurrentPacket());
 #endif
 
 			// will be retransmitted the all packets from the last successfully received one
 
-			u_char* cur = receiver -> getPointerLastReceivedPacket();			
+			u_char* cur = receiver -> getPointerLastReceivedPacket();
 
          for (;;) {
-            				
+
 				// the algorithm is similar to 'generate' method
 
 				u_int ngen_temp = 0;
             neps = numEPs;
-				
+
             cur = file -> gotoNextEndPoint(cur, eps, &neps, &gen_size1, &ngen_temp);
 
             if (!cur) break;
@@ -748,7 +748,7 @@ int SendingControl :: retransmit(const TimeStamp* currentTime) {
 
             readyBuffer(cur, gen_size1);
 
-#ifdef DEBUG_CONVTEST            
+#ifdef DEBUG_CONVTEST
 				printf("retransmition packet %i\n", ngen_temp);
 #endif
 				if (gen_size1 < device -> getInterface(eps[neps].interfaceNum) -> getMinimalSizeOfPacket())
@@ -774,13 +774,13 @@ int SendingControl :: retransmit(const TimeStamp* currentTime) {
 }
 
 void ReplaceMaker :: operator=(const ReplaceMaker& s) {
-   
+
    if (filter) delete filter;
 
    filter = Null;
    tagval = s.tagval;
    soughVal = s.soughVal;
-   
+
    if (s.filter) filter = new CommonField(*(s.filter));
    active = s.active;
 }

@@ -4,7 +4,7 @@
 #include "stresstest.h"
 #include "mstring.h"
 #include "exceptions.h"
-#include "myMutex.h"
+#include "mutex.h"
 
 #ifdef WIN32
 #define _BITTYPES_H
@@ -64,7 +64,7 @@ class Interface;
  * user info that is used with pcap_packet_handler
  */
 struct pcap_packet_handler_info {
-	
+
 	Interface* interf;
 	MString uniqueName;
 	stresstest_packet_handler handler;
@@ -102,7 +102,7 @@ enum TerminationConditions {
    /** 'setRequestToBreakTrace' may work out
     *  if not then terminate thread roughly
     */
-   TC_ONLY_REQUEST   
+   TC_ONLY_REQUEST
 };
 
 
@@ -150,8 +150,8 @@ protected:
    }
 
 public:
-   
-   pcap_packet_handler_info threadInfo;   
+
+   pcap_packet_handler_info threadInfo;
 
    Interface(const MString& name) : name(name) {
       thread=0;
@@ -184,7 +184,7 @@ public:
    const MString& getUniqueName() const {
       return uniqueName;
    }
-	
+
 	void setUniqueName(const MString& name) {
 		uniqueName = name;
 	}
@@ -221,7 +221,7 @@ public:
    ResultOfTracing trace(stresstest_packet_handler packet_handler,void* user_data);
 
    /**
-    * tries to stop trace thread more safely first, 
+    * tries to stop trace thread more safely first,
     * if not succeeds then kills thread,
     * see TerminationConditions
     */
@@ -241,22 +241,22 @@ public:
    void traceByThread (stresstest_packet_handler tr, void* info);
    virtual TerminationConditions getTerminationConditions() = 0;
 	virtual void close() = 0;
-   virtual int getMinimalSizeOfPacket() {return 0;}	
+   virtual int getMinimalSizeOfPacket() {return 0;}
    virtual Device* getDevice() { return device; };
 };
 
 class Network {
 
 private:
-	
+
    //int device_num[NET_MAX_DEVS];
 	//char device_name[NET_MAX_DEVS][MAX_SIZE_DEVICE_NAME];
-   
+
    //volatile HANDLE interf[NET_MAX_DEVS] -> thread;
    //pcap_packet_handler_info infoForThread[NET_MAX_DEVS];
 
 protected:
-   
+
    bool safeTerm;
 
    vector<Device*> devices;
@@ -264,18 +264,18 @@ protected:
 
    //volatile bool requestForBreak[NET_MAX_DEVS];
    //volatile bool tracingCurrently[NET_MAX_DEVS];
-	
-	//int num_open_devs;   
+
+	//int num_open_devs;
 
 public:
-	
+
 	static boolean quiet;
-   	
-   Network();   
+
+   Network();
    ~Network() { release(); }
-	
+
 	void setDevices(vector<Device*>);
-	
+
 //	virtual void init () = 0;
    void openInterface(const string& device, const MString& name);
    uint closeInterface(const MString& name);
@@ -285,31 +285,31 @@ public:
 			throw new Exception("no opened network interface, use -d option or OPEN command");
 		}
 		userCheck(num<numOpenedInterfaces());
-		return interf.at(num); 
+		return interf.at(num);
 	}
 	//virtual int openInterface(const char* name) = 0;
 	void release();
-	
+
    /**
     * sets safety of trace termination. Safe termination avoids errors but may be not immediate.
     * see Instance :: stopTraceSafely
     * default is false
     * @param safe
     */
-   void setSafeTerm(bool safe) {  safeTerm = safe; } 
+   void setSafeTerm(bool safe) {  safeTerm = safe; }
    /**
     * stops traces, see setSafeTerm
     */
-   void stopAllTrace();   
+   void stopAllTrace();
 
 //	void register_device_name(int interface_num, const char* name);
 //	const char* get_device_name(int interface_num);
    int get_device_num(int index);
 
 	int numOpenedInterfaces() { return interf.size(); }
-	
+
 	//void set_device_num(int index, int devnum);
-   
+
 	/** return device_num */
 	//int get_device_num(int index);
 
@@ -341,7 +341,7 @@ public:
 	 *  when only WAIT commands start sniffering and stop it after receiving what they need
     */
 	virtual bool isParallelSniffersAllowed() = 0;
-	
+
 };
 class EthInterfaceCore;
 
@@ -351,8 +351,8 @@ class EthInterface : public Interface {
 
 public:
    EthInterfaceCore* core;
-   
-   EthInterface(const MString& name, const EthDevice& device);   
+
+   EthInterface(const MString& name, const EthDevice& device);
    ~EthInterface() { this -> close(); }
 
    void send(const u_char*, int size);
@@ -362,7 +362,7 @@ public:
    void setFilter(char* filterString);
    TerminationConditions getTerminationConditions() { return TC_SAME_THREAD_OR_REQUEST; }
    int getMinimalSizeOfPacket() { return minimalSizeOfPacket; }
-	void close();   
+	void close();
    #ifdef ETHERNET_ACCESS_DETAILS
    EthInterfaceCore* getCore() { return core; };
    #endif
@@ -374,7 +374,7 @@ class EthInterfaceCore {
    friend class EthInterface;
    EthInterface* interf;
    pcap_t* pcap;
-   
+
    EthInterfaceCore(EthInterface* in, pcap_t* pcap) {
       interf = in;
       this -> pcap = pcap;
@@ -391,16 +391,16 @@ class EthDevice : public Device
 				  const u_char *);
 
 private:
-   
-   static bool is_inited;	
+
+   static bool is_inited;
 	static UInt defaultSanpLen;
 
 private:
-	
+
    static bool promisc_mode;
-	
+
    static void init();
-   
+
 public:
 
    static const string name;
@@ -421,7 +421,7 @@ public:
 class IPInterface : public Interface {
    public:
       SOCKET s;
-      IPInterface(const MString& name);      
+      IPInterface(const MString& name);
       ~IPInterface() {
 			this -> close();
       }
@@ -430,7 +430,7 @@ class IPInterface : public Interface {
    void send(const u_char*, int size);
 	ResultOfTracing traceInt(stresstest_packet_handler packet_handler, void* user_data);
    void stopTraceInt();
-   TerminationConditions getTerminationConditions() { return TC_ONLY_REQUEST; }   
+   TerminationConditions getTerminationConditions() { return TC_ONLY_REQUEST; }
    };
 
 
@@ -454,19 +454,19 @@ public:
 };
 
 class SocketInterface : public Interface {
-	friend class UDPDevice;	
-	friend class TCPDevice;	
+	friend class UDPDevice;
+	friend class TCPDevice;
 protected:
-	SOCKET s;	
+	SOCKET s;
 	SocketInterface(const MString& name) : Interface(name) {}
 	virtual SOCKET createSocket(sockaddr_in addr, bool serverMode) = 0;
 	void open();
 	ResultOfTracing traceInt(stresstest_packet_handler packet_handler, void* user_data);
 	void stopTraceInt();
-   TerminationConditions getTerminationConditions() { return TC_ONLY_REQUEST; }   
+   TerminationConditions getTerminationConditions() { return TC_ONLY_REQUEST; }
 	void close();
 	~SocketInterface() { this -> close(); }
-	
+
 public:
 	class SendingOverSocketException : public Exception {
 	public:
@@ -488,20 +488,20 @@ public:
 
 class TCPInterface : public SocketInterface {
 
-protected:	
-		
+protected:
+
 	SOCKET createSocket(sockaddr_in addr, bool serverMode);
-	
+
 public:
-   
-   TCPInterface(const MString& name) : SocketInterface(name) {};      
-   virtual void send(const u_char*, int size);	
+
+   TCPInterface(const MString& name) : SocketInterface(name) {};
+   virtual void send(const u_char*, int size);
 };
 
 class TCPDevice : public Device {
 
    friend class TCPInterface;
-   
+
 //   TCPInterface* getTcpInterface(int num) { return static_cast<TCPInterface*>(interf[num]); }
 
 public:
@@ -510,13 +510,13 @@ public:
    /** timeout while waiting for connections (in server mode) and new data ('select' function)
     */
 	static UInt timeoutInMilliseconds;
-   
-   
+
+
    const string& gettype() { return name; }
-   Interface* newInterface(const MString& name) { 
-		TCPInterface* in = new TCPInterface(name); 
-		in -> open(); 
-		return in; 
+   Interface* newInterface(const MString& name) {
+		TCPInterface* in = new TCPInterface(name);
+		in -> open();
+		return in;
 	}
    virtual UInt getSizeLimit() { return 0x7fffffff; }
    virtual UInt getPositionDataBegins() { return 54; }
@@ -526,32 +526,32 @@ public:
 
 class UDPInterface : public SocketInterface {
 
-protected:		
+protected:
 	sockaddr_in remoteAddr;
 	SOCKET createSocket(sockaddr_in addr, bool serverMode);
-	
+
 public:
-   
-   UDPInterface(const MString& name) : SocketInterface(name) {  };   
+
+   UDPInterface(const MString& name) : SocketInterface(name) {  };
 	void send(const u_char* buf, int size);
 };
 
 class UDPDevice : public TCPDevice {
 
-   friend class UDPInterface;   
+   friend class UDPInterface;
 
 public:
 
-   static const string name;      
-   
+   static const string name;
+
    const string& gettype() { return UDPDevice :: name; }
-   Interface* newInterface(const MString& name) { 
-		UDPInterface* in = new UDPInterface(name); 
-		in -> open(); 
+   Interface* newInterface(const MString& name) {
+		UDPInterface* in = new UDPInterface(name);
+		in -> open();
 		return in;
-	}   
+	}
    virtual UInt getPositionDataBegins() { return 42; }
-	
+
 };
 
 #endif // NETWORK_H
