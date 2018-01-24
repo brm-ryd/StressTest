@@ -288,7 +288,7 @@ int ConvImit :: init(TraceFile* tfile) {
 /************************************************************
 /*************** Class InteractionControl *******************
 /************************************************************
-/***********************************************************/
+
 
 
 InteractionControl :: InteractionControl() {
@@ -868,11 +868,11 @@ void ConvtestResult :: print() {
 }
 
 void ConvtestResult :: setByString(
-   const char* listOfPackets, /* specifies array of packet, format example: 1-3;4-5;6-
-                                 if the string is finished by - then all next packets in file will be also added
+   const char* listOfPackets, /* specifies packet array, format example: 1-3;4-5;6-
+                                 if the string is finished - then all next packets in file will be also added
                                  special string "any" means all packets
                                  */
-   UInt totalNumberOfPackets // the total number of packets in trace file
+   UInt totalNumberOfPackets // total number of packets in trace file
    ) {
 
    bool isRange = false;

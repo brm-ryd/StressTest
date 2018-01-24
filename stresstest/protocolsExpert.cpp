@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "protocolsExpert.h"
-#include "pacbuf.h"
+#include "packetbuff.h"
 #include "tcpip.h"
 
 //const int sizeAutoCalcValueInitArray = 7;
 
 
-// ATTENTION: must correspond the 'keyWordsAutoCalcValues'
+// ATTENTION: must correspond to 'keyWordsAutoCalcValues'
 // NOTE: values will be calculated if the following order (it may be important)
 //AutoCalcValue autoCalcValueInitArray[sizeAutoCalcValueInitArray] =
 //{
@@ -85,23 +85,23 @@ void AutocalcManager :: checkPacketModification(int startPositionModifiedBlock, 
 						||
 						it -> getField().getPos() >= startPositionModifiedBlock + sizeModifiedBlock
 					)
-				) 
-								
+				)
+
 				it -> disactivate();
-		}	
+		}
 
 		++it;
 	}
 }
 
 
-void AutocalcManager :: computeAndSetValues(u_char* contentOfPacket, int sizePacBuf) {
+void AutocalcManager :: computeAndSetValues(u_char* contentOfPacket, int sizePacketBuff) {
 
 //	for (int i = 0; i < values.size(); i++)
 //	{
 //		if (values.at(i).isActive()) {
 //
-//			calcValue(i, contentOfPacket, sizePacBuf);
+//			calcValue(i, contentOfPacket, sizePacketBuff);
 //		}
 //	}
 
@@ -113,8 +113,6 @@ void AutocalcManager :: computeAndSetValues(u_char* contentOfPacket, int sizePac
       }
 
       if (val.size())
-         protocolExperts[i] -> calcAndSet(val, *fields, contentOfPacket, sizePacBuf);
+         protocolExperts[i] -> calcAndSet(val, *fields, contentOfPacket, sizePacketBuff);
    }
 }
-
-

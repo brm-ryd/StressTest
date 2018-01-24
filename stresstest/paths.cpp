@@ -22,7 +22,7 @@ MString& Paths :: search(MString& name, const char* filename) {
 
 		if (!checkPath(!name)) {
 
-			// searches in all folders from list
+			// search in all folders from list
 
 			vector<MString>::iterator it = paths.begin();
 			for (; it != paths.end(); it++)
