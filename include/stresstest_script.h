@@ -8,7 +8,7 @@
 #include "stresstest_functs.h"
 #include "reqandstat.h"
 #include "paths.h"
-#include "mbuffer.h"
+#include "messagebuff.h"
 #include "mstring.h"
 #include "fieldVariableValues.h"
 #include "protocolsExpert.h"
@@ -23,19 +23,19 @@ class Testing;
 /**	generating packets mainly,
    and waiting some packets while using special commands
 */
-#define SR_GEN  		1	  
+#define SR_GEN  		1
 
 /**
 analysing the script,
 and passing all defined packets to ReqAndStat object for further work,
 the requests for packets correspond all interfaces except first
 */
-#define SR_STAT 		2		
+#define SR_STAT 		2
 /**
 same as SR_STAT
 but the requests for packets correspond all interfaces starting from first
 */
-#define SR_SNIFFER 		3	
+#define SR_SNIFFER 		3
 
 enum TypeOfEntity {
 
@@ -58,49 +58,49 @@ enum QuotesProccessing {
 #define NOT_KEY_WORD (-1)
 
 struct KeyWordsInfo {
-   
+
 	const char* keyword;
 	const char* parameterssdf;
 	const char* descriptionsdf;
 
    //KeyWordsInfo(const char* s1, const char* s2, const char* s3) {
-      
+
    //}
 };
 
  /** enumeration of key words (ATTENTION: must correspond to key_words array) */
 typedef enum {
 	KW_SEND,
-	KW_PAUSE, 
+	KW_PAUSE,
 	KW_BLOCK,
 	KW_ACCEPT,
 	KW_ANY,
 	KW_REP,
 	KW_SENDA,
 	KW_SENDD,
-	KW_CLEAR_MASK, 
-	KW_INC, 
-	KW_OFFSET,	
-	KW_DEFAULTS, 
-	KW_INCLUDE, 
-	KW_DEVICES, 
-	KW_WAIT, 
+	KW_CLEAR_MASK,
+	KW_INC,
+	KW_OFFSET,
+	KW_DEFAULTS,
+	KW_INCLUDE,
+	KW_DEVICES,
+	KW_WAIT,
 	KW_EXIT,
-	KW_PASS, 
-	KW_DEFINE, 
-	KW_MASK, 
-	KW_POS, 
-	KW_BACK, 
+	KW_PASS,
+	KW_DEFINE,
+	KW_MASK,
+	KW_POS,
+	KW_BACK,
 	KW_CLEAR_HISTORY,
 	KW_VAR,
 	KW_NAME_OF_PACKET,
 	KW_OUTPUT_MESSAGE,
 	KW_EXTENDED,
 	KW_MAIN_INTERFACE,
-	KW_REVERS, 
-	KW_BEEP,						
-	KW_SAFETERM,				
-	KW_INTERVAL,				
+	KW_REVERS,
+	KW_BEEP,
+	KW_SAFETERM,
+	KW_INTERVAL,
 	KW_INCVAR,
 	KW_TOWAIT,
 	KW_GDEFINE,
@@ -108,7 +108,7 @@ typedef enum {
 	KW_QUIET,
 	KW_CYC,
 	KW_SYSCALL,
-	KW_NOTDOUBLEMES,	
+	KW_NOTDOUBLEMES,
 	KW_RAND_VALUE,
 	KW_CAREFULWAIT,
 	KW_OPENTRACE,
@@ -180,7 +180,7 @@ typedef enum {
    KW_CLEAR,
    KW_RECV,
    KW_RETURN
-} 
+}
 KEY_WORD_ID;
 
 /**
@@ -189,7 +189,7 @@ KEY_WORD_ID;
  * It receives the whole control over reading after one of its command is found in script.
  * See derived classes as examples.
  * @param command
- * @return 
+ * @return
  */
 class CommandsProcessor
 {
@@ -197,16 +197,16 @@ public:
    /**
     * returns true if given command may be processed by this processor.
     * @param command
-    * @return 
+    * @return
     */
    virtual boolean isProcessCommand(const MString& command) = 0;
    /**
     * returns the description of parameters (printed for user)
     * @param command
-    * @return 
+    * @return
     */
-   virtual MString getParameters(const MString& command) = 0;   
-   
+   virtual MString getParameters(const MString& command) = 0;
+
    /**
     * processes command. this method may read from script until the list of command's parameters is finished.
     * after call the cursor must be set just after parameters list.
@@ -314,8 +314,8 @@ private:
    /** field whose value will be incremented and inserted for each next packet
       while generating multiple packets (REP command)
    */
-	CommonField* autoIncrementedField;  
-		
+	CommonField* autoIncrementedField;
+
 	/** current text */
 	StresstestTextBuffer* text;
 
@@ -332,7 +332,7 @@ private:
 	MString nameOfCurrentPacket;
    /** message to display when packet is received
    */
-	MString outputMessageForCurrentPacket; 
+	MString outputMessageForCurrentPacket;
 
 	/** reference to external object */
 	Network* dev;
@@ -345,7 +345,7 @@ private:
 	Substitutions globalDefines;
 	/** stores what were added by KW_DEFINE command */
 	Substitutions defines;
-	SequenceOfPackets* buf;					
+	SequenceOfPackets* buf;
 	FieldVariableValues variables;
 
 	/** regime of work, see SR_ defines */
@@ -353,13 +353,13 @@ private:
 
    /** if not 0 then it's the number of a packet that will be a single one actually generated
    */
-	int one_packet;  
+	int one_packet;
 
    /**
       when generating multiple packets (REP command)
       then interval between sending packets will be equal to this value
    */
-	uint interval;		
+	uint interval;
 
 	int numberOfGenerations;
 
@@ -369,12 +369,12 @@ private:
       in this regime requests for packets will have another syntax,
       see sendCommand, KW_DEFAULTS
    */
-	bool extendedRegime;	
+	bool extendedRegime;
 	Convtest convtest;
    /**	used for correct processing of fasttest command when it appeares in not top level file,
       but in one from included
    */
-	MString nameTopLevelFile;	
+	MString nameTopLevelFile;
 
 	/** true: KW_FASTTEST command has been already processed */
 	bool fastTestAlreadyProccessed;
@@ -391,12 +391,12 @@ private:
    /**
       defined the number of repetitions while processing some kind of command or block of script
   */
-   UInt numIterations; 
+   UInt numIterations;
 
 	/** stores the result of last system call */
 	int resultLastSystemCall;
 
-public:			
+public:
 
 private:
 
@@ -405,7 +405,7 @@ private:
 	 return the type of compare or TCF_UNDEFINED if it's not compare qualifier
 	*/
 	TypeCompareField isCompareQualifier(const MString& word);
-			
+
 	/**
 	 reads the sequence of requests from text (they are parameters to commands: send, wait and others)
 	 the concrete command must be specified through its key word, the behavior may depend from command
@@ -423,8 +423,8 @@ private:
 	void prepare_packet();
 
 	/** increments 'autoIncrementedField' and sets its new value to current packet */
-	void performAutoincrement();		
-		
+	void performAutoincrement();
+
 	/** is called after meeting the name of field in text */
 	void processFieldOcc(
 		const FieldInfo& fieldParameters
@@ -432,7 +432,7 @@ private:
 
 	void processFieldDefinition(
 		const char* fieldName
-		);	
+		);
 
 	/**
 	 * @param keywordID key word that causes this sending
@@ -474,10 +474,10 @@ private:
    CommandsProcessor* getProcessor(const MString& command);
 
    void runBlock(bool isIdleMode);
-	
+
 	void processDeprecatedCommands(int kw_id);
 	void processElse(bool isProcess);
-	
+
 	class ReturnException : public Exception {
 	public:
 		ReturnException() : Exception() {}
@@ -549,7 +549,7 @@ public:
 	MString& read_word(MString& word, bool failOnEmptyWord = false, bool removeEnclosingCommas = false) throw(Exception*);
 
 	/**
-	 * reads the name of a entity (field, variable, etc.) when the name is needed, not its value 
+	 * reads the name of a entity (field, variable, etc.) when the name is needed, not its value
     */
 	void readNameEntity(MString* word, bool failOnEmptyWord = true, TypeOfEntity typeOfEntity = SE_NOT_DEFINED) {
 
@@ -571,14 +571,14 @@ public:
 
 		return readEntity(word, true,          failOnEmptyWord, QP_REMOVE_OPTIONAL_QUOTES,  false);
 	}
-	
+
 	/**
 	 * reads value resolving names of entities, quotes for string values are required and will be removed
     */
    int readStringRequireQuots(MString* word, bool failOnEmptyWord = true) {
 		return readEntity(word, true,          failOnEmptyWord, QP_REMOVE_OPTIONAL_QUOTES, false, true);
 	}
-	
+
 	/**
 	 * reads string value (only this type) resolving names of entities, quotes for string values are required and will be removed
     */
@@ -603,8 +603,8 @@ public:
       bool failOnKeyword,
       bool failOnEmptyWord,
       QuotesProccessing quotesProccessing,
-      bool doNotSearchEntity,  
-      bool checkNotResolvedName = false, 	
+      bool doNotSearchEntity,
+      bool checkNotResolvedName = false,
       bool resolveRef = true,
       TypeOfEntity typeOfEntity = SE_NOT_DEFINED
       );
@@ -624,17 +624,17 @@ public:
 		);
 
 	Script(Network& device, ReqAndStat& externRas, TraceFile& traceFile, AutocalcManager& autocalcManager, u_char regime);
-	~Script();	
+	~Script();
 
 	void setCommandProcessors(vector<CommandsProcessor*> commandProcessors);
-	
+
 	void setRequestForBreak() { needBreak = true; convtest.needBreak = true; }
 
 	/**
 	 * Reads file and calls run method
 	 */
 	void processFile(const char* filename) throw(Exception*);
-	
+
 	/**
 	 * processes previously loaded or given text
 	 * step by step reads words from text (commands, field definitions and others)
@@ -648,14 +648,14 @@ public:
 				bool isIdleMode = false, // true: only reads words, doesnt execute any command, until the end of block (KW_END_BLOCK)
             bool terminateByBlockEnd = false
 				)
-				throw(Exception*);	
+				throw(Exception*);
 
-	
+
 
 	/**
 	 * adds path where included files are searched
 	 */
-	void add_include_path(const char* path) throw(Exception*);	
+	void add_include_path(const char* path) throw(Exception*);
 
 	/**
 	 * renders to initial state
@@ -674,7 +674,7 @@ public:
 	void set_device (
 		Network* dev,
 		int mainInterfaceNum
-		);		   	
+		);
 
 	void printFieldsInfo() {
 		fields.print();
@@ -686,11 +686,9 @@ public:
 
    void clearDefines() {
       defines.clear();
-      globalDefines.clear();      
+      globalDefines.clear();
    }
 
 };
 
 #endif //STRESSTEST_SCRIPT_H
-
-

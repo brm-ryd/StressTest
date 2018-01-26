@@ -4,12 +4,12 @@
 
 #include "stresstest.h"
 
-#include "mbuffer.h"
+#include "messagebuff.h"
 #include "fields.h"
 
 /**
  * Calculated value with associated status: activity, field for which it's been assigned etc.
- * It's active if it has been specified as value for a field in the description of a packet in script 
+ * It's active if it has been specified as value for a field in the description of a packet in script
  * (then getField() method returns this field).
  * Expert index is internally used by AutocalcManager class.
  */
@@ -22,12 +22,12 @@ class AutoCalcValue {
 public:
 
    const string& getName() const { return name; }
-   
+
    boolean isActive() const { return (field != Null ); }
    int getExpertIndex() const {
       return expertIndex;
    }
-   
+
    const FieldInfo& getField() const { userCheck(field); return *field; }
    void activate(const FieldInfo& field) {
       this->field = new FieldInfo(field);
@@ -76,7 +76,7 @@ public:
     * During calculation the method may use the content of given packet and the information about registered fields.
     * @param values set of values that need to be calculated and written
     * @param fields actual fields defined in script (may be used by calculation algorithm)
-    * @param packet buffer of packet 
+    * @param packet buffer of packet
     * @param pacSize size of packet's buffer
     */
    virtual void calcAndSet(const vector<AutoCalcValue>& values, const Fields& fields, u_char* packet, UInt pacSize) = 0;
@@ -92,7 +92,7 @@ public:
    Method computeAndSetValues calculates and writes values for all active fields.
    Method setValueAsActive is used to activate a field.
    Method checkPacketModification disactivates field if its region overlaps the given modified region.
-	
+
 */
 class AutocalcManager
 {
@@ -109,12 +109,12 @@ private:
    void fillValues();
 
 public:
-	
-   AutocalcManager() {      		
+
+   AutocalcManager() {
       this -> fields = 0;
    }
 	~AutocalcManager() {};
-	
+
 	void setProtocolExperts(vector<ProtocolsExpert*> givenProtocolExperts) {
 		protocolExperts.assign(givenProtocolExperts.begin(), givenProtocolExperts.end());
       fillValues();
@@ -138,7 +138,7 @@ public:
 	 if modified block and some value (among already active) overlap then this value will be marked as not active
 	*/
 	void checkPacketModification(int startPositionModifiedBlock, int sizeModifiedBlock);
-	
+
 	/** calculates all values and sets the calculated values in given buffer */
 	void computeAndSetValues(u_char* contentOfPacket, int sizePacBuf);
 };
