@@ -39,20 +39,20 @@ void registerGlobalObjects(Network* network, ReqAndStat* ras, Script* script) {
 }
 
 
-void signal_handler(int sig) {		
+void signal_handler(int sig) {
 
 	userCheck(globDevice);
 	userCheck(globScript);
 	userCheck(globRas);
-	
+
    for (UInt i = 0;  i < globDevice -> numOpenedInterfaces(); i++) {
       globDevice -> getInterface(i) -> setRequestToBreakTrace();
    }
 
 	globRas -> setRequestForBreak();
-	globScript -> setRequestForBreak();	
+	globScript -> setRequestForBreak();
 
-	if (forcedTerm) {		
+	if (forcedTerm) {
 		exit(0);
 	}
 }
@@ -105,10 +105,10 @@ void myexit(int state, Exception* ex) {
 
 	if (!ex) {
 
-		
+
 	}
 	else {
-	
+
 		// exception reference is specified
 
 		ex -> format();
@@ -126,10 +126,10 @@ void myexit(int state, Exception* ex) {
 
 	ADDTOLOG1("myexit -- start");
 
-	// stops tracing (needed while terminating by Ctrl + C)	
+	// stops tracing (needed while terminating by Ctrl + C)
 
-	userCheck(globRas);	
-   globRas -> stopTrace();	
+	userCheck(globRas);
+   globRas -> stopTrace();
 
 	// for extra safety stopes threads for globalDevice although they may already be stoped by globalRas
    // ReqAndStat object may do it more carefully
@@ -140,7 +140,7 @@ void myexit(int state, Exception* ex) {
 	}
 
    mysleep(50); // it seems that pause is necessary after stoping of trace-treads befor calling to exit
-                  // in order to avoid "segmentation fault"	
+                  // in order to avoid "segmentation fault"
 
 	#ifdef MYLOG
 	globalLog.flush();
@@ -237,7 +237,7 @@ void trace_packets_to_file (Interface* interf, char* tracefile) {
 	#ifndef WIN32
 	int f = open(tracefile,O_WRONLY|O_CREAT|O_TRUNC|O_BINARY,S_IWRITE|S_IREAD);
 	if (!f) {
-		 
+
 		 throw new Exception("unable to open file '%s' for write : %s",tracefile, strerror(errno));
 	}
 	#else
@@ -245,10 +245,10 @@ void trace_packets_to_file (Interface* interf, char* tracefile) {
 		FILE_ATTRIBUTE_HIDDEN, 0);
 	if (f == INVALID_HANDLE_VALUE) {
 
-		throw new Exception("unable to open file '%s' for write : %s",tracefile, strerror(errno));		
+		throw new Exception("unable to open file '%s' for write : %s",tracefile, strerror(errno));
 	}
 	#endif
-	
+
 	// determining unique name of interface
 	for (int i=0; tracefile[i]; i++) {
 
@@ -285,8 +285,8 @@ void trace_packets_to_file (Interface* interf, char* tracefile) {
    }
    else
       interf -> trace(trace_to_file_handler_light, (void*)&tr_info);
-	
-	close_file(f);		
+
+	close_file(f);
 }
 
 
@@ -303,10 +303,10 @@ void trace_to_file_handler (u_char *info, const struct pcap_pkthdr * h,
 	write_to_file(f,&h->len,sizeof(h->len),&nw);
 	write_to_file(f,pkt_data,h->caplen,&nw);
 	/*if (num != -1) {
-		
+
 		printf("%i",num);
 	}
-	else 
+	else
 		printf("*");*/
 
 	/*#ifdef WIN32
@@ -318,7 +318,7 @@ void trace_to_file_handler (u_char *info, const struct pcap_pkthdr * h,
 }
 
 int trace_to_file_handler_light (u_char* pkt_data, u_int len, void* info) {
-   struct timeval time = {0,0};	
+   struct timeval time = {0,0};
    struct pcap_pkthdr h = { time, len ,len};
    trace_to_file_handler((u_char*)info,&h,pkt_data);
    return 0;
@@ -334,7 +334,7 @@ const char* getStringOfDump(const u_char* dump, int sizeOfDump) {
 
 		for (int i = 0; i < sizeOfDump; i ++) {
 
-			sprintf(bytesString + i *  2, "%.2x", dump[i]);			
+			sprintf(bytesString + i *  2, "%.2x", dump[i]);
 		}
 	}
 	else bytesString[0] = 0;
@@ -353,7 +353,7 @@ const char* getStringOfDump1(const u_char* dump, int sizeOfDump) {
 
 		for (int i = 0; i < sizeOfDump; i ++) {
 
-			sprintf(bytesString + i *  2, "%.2x", dump[i]);			
+			sprintf(bytesString + i *  2, "%.2x", dump[i]);
 		}
 	}
 	else bytesString[0] = 0;
@@ -362,10 +362,10 @@ const char* getStringOfDump1(const u_char* dump, int sizeOfDump) {
 }
 
 
-void putValuesInMessage(MString& message, const Fields* fields, const Substitutions* substitutions, const FieldVariableValues* fieldVariableValues, const u_char* contentOfPacket, UInt sizePacBuf) {
+void putValuesInMessage(MessageString& message, const Fields* fields, const Substitutions* substitutions, const FieldVariableValues* fieldVariableValues, const u_char* contentOfPacket, UInt sizePacBuf) {
 
-	MString resultMessage;	
-		
+	MessageString resultMessage;
+
 	UInt si = 0;
 	UInt di = 0;
 	for (; si < message.size(); ) {
@@ -379,13 +379,13 @@ void putValuesInMessage(MString& message, const Fields* fields, const Substituti
 			if (si != message.size() && si > posFirstDollar + 1) {
 
 				bool found = false;
-				MString nameOfItem;
+				MessageString nameOfItem;
 				nameOfItem = message;
-				
-				nameOfItem.erase(0, posFirstDollar + 1);				
-				nameOfItem.erase(si - posFirstDollar - 1, nameOfItem.size() - (si - posFirstDollar - 1));				
-																																				  
-				MString valueString = nameOfItem;
+
+				nameOfItem.erase(0, posFirstDollar + 1);
+				nameOfItem.erase(si - posFirstDollar - 1, nameOfItem.size() - (si - posFirstDollar - 1));
+
+				MessageString valueString = nameOfItem;
 
 				// searches amoung fields
 				if (!found && fields) {
@@ -405,7 +405,7 @@ void putValuesInMessage(MString& message, const Fields* fields, const Substituti
 					catch (Exception* e) {
 
 						delete e;
-					}					
+					}
 				}
 
 				// searches amoung substitutions
@@ -414,7 +414,7 @@ void putValuesInMessage(MString& message, const Fields* fields, const Substituti
 					const char* s;
 					s = substitutions -> search_value(!nameOfItem);
 					if (s) {
-						
+
 						valueString = s;
 						StresstestTextBuffer :: removeEnclosingCommas(&valueString);
 						found = true;
@@ -432,17 +432,17 @@ void putValuesInMessage(MString& message, const Fields* fields, const Substituti
 						found = true;
 					}
 				}
-				
+
 				if (!found) {
 
 					throw new Exception("'%s' is not resolved", !nameOfItem);
 				}
 
 				resultMessage.insert(di, valueString);
-				di += valueString.size();				
+				di += valueString.size();
 
 				si++;
-				continue;				
+				continue;
 			}
 			else {
 
@@ -450,7 +450,7 @@ void putValuesInMessage(MString& message, const Fields* fields, const Substituti
 					si = posFirstDollar;
 			}
 		}
-				
+
 		resultMessage.resize(di + 1);
 		resultMessage.at(di) = message[si];
 		si++;
@@ -458,7 +458,7 @@ void putValuesInMessage(MString& message, const Fields* fields, const Substituti
 	}
 
 	resultMessage.resize(di);
-		
+
 	/*UInt res;
 	while ((res = resultMessage.searchString("$$", 0)) != STRING_NOT_FOUND) {
 

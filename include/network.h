@@ -2,7 +2,7 @@
 #define NETWORK_H
 
 #include "stresstest.h"
-#include "mstring.h"
+#include "messagestring.h"
 #include "exceptions.h"
 #include "mutex.h"
 
@@ -66,7 +66,7 @@ class Interface;
 struct pcap_packet_handler_info {
 
 	Interface* interf;
-	MString uniqueName;
+	MessageString uniqueName;
 	stresstest_packet_handler handler;
 	void* user_data;
 };
@@ -139,9 +139,9 @@ class Interface {
 
    volatile bool tracingCurrently;
    volatile HANDLE thread;
-   MString name;
+   MessageString name;
    volatile bool requestForBreak;
-   MString uniqueName;
+   MessageString uniqueName;
    Device* device;
 
 protected:
@@ -153,7 +153,7 @@ public:
 
    pcap_packet_handler_info threadInfo;
 
-   Interface(const MString& name) : name(name) {
+   Interface(const MessageString& name) : name(name) {
       thread=0;
       requestForBreak=false;
       tracingCurrently=false;
@@ -177,15 +177,15 @@ public:
       return thread;
    }
 
-   const MString& getName() const {
+   const MessageString& getName() const {
       return name;
    }
 
-   const MString& getUniqueName() const {
+   const MessageString& getUniqueName() const {
       return uniqueName;
    }
 
-	void setUniqueName(const MString& name) {
+	void setUniqueName(const MessageString& name) {
 		uniqueName = name;
 	}
 
@@ -277,8 +277,8 @@ public:
 	void setDevices(vector<Device*>);
 
 //	virtual void init () = 0;
-   void openInterface(const string& device, const MString& name);
-   uint closeInterface(const MString& name);
+   void openInterface(const string& device, const MessageString& name);
+   uint closeInterface(const MessageString& name);
    Interface* getInterface(UInt num) {
 		// TODO[at] removal of an interface from list causes that other interfaces cannot be get by number
 		if (numOpenedInterfaces() == 0) {
@@ -314,10 +314,10 @@ public:
 	//int get_device_num(int index);
 
 	/** returns the index of interface or NOT_SUCH_INTERFACE */
-	UInt getInterfaceNumberByName(const MString& name, bool failOnNotFound = false);
+	UInt getInterfaceNumberByName(const MessageString& name, bool failOnNotFound = false);
 
 	/** returns the unique name of interface or NOT_SUCH_INTERFACE if unique name has not been specified */
-	const MString getNameOfInterface(
+	const MessageString getNameOfInterface(
 		UInt interfaceNum	// index of interface
 		);
 };
@@ -328,7 +328,7 @@ public:
  */
 class Device {
 public:
-   virtual Interface* newInterface(const MString& name) = 0;
+   virtual Interface* newInterface(const MessageString& name) = 0;
    virtual const string& gettype() = 0;
    /**
     * returns position where data starts which will be passed to send method, data before will be ignored while working with device
@@ -352,7 +352,7 @@ class EthInterface : public Interface {
 public:
    EthInterfaceCore* core;
 
-   EthInterface(const MString& name, const EthDevice& device);
+   EthInterface(const MessageString& name, const EthDevice& device);
    ~EthInterface() { this -> close(); }
 
    void send(const u_char*, int size);
@@ -413,7 +413,7 @@ public:
 
 //   EthInterface* getEthInterface(int num) { return static_cast<EthInterface*>(interf[num]); }
    const string& gettype() { return name; }
-   Interface* newInterface(const MString& name) { return new EthInterface(name, *this); }
+   Interface* newInterface(const MessageString& name) { return new EthInterface(name, *this); }
    virtual UInt getSizeLimit() { return 1514; };
 	virtual bool isParallelSniffersAllowed() { return true; };
 };
@@ -421,7 +421,7 @@ public:
 class IPInterface : public Interface {
    public:
       SOCKET s;
-      IPInterface(const MString& name);
+      IPInterface(const MessageString& name);
       ~IPInterface() {
 			this -> close();
       }
@@ -447,7 +447,7 @@ public:
    static const string name;
 
 	const string& gettype() { return name; }
-   Interface* newInterface(const MString& name) { return new IPInterface(name); }
+   Interface* newInterface(const MessageString& name) { return new IPInterface(name); }
    virtual UInt getSizeLimit() { return 65535 + 14; }
    virtual UInt getPositionDataBegins() { return 14; }
 	virtual bool isParallelSniffersAllowed() { return true; };
@@ -458,7 +458,7 @@ class SocketInterface : public Interface {
 	friend class TCPDevice;
 protected:
 	SOCKET s;
-	SocketInterface(const MString& name) : Interface(name) {}
+	SocketInterface(const MessageString& name) : Interface(name) {}
 	virtual SOCKET createSocket(sockaddr_in addr, bool serverMode) = 0;
 	void open();
 	ResultOfTracing traceInt(stresstest_packet_handler packet_handler, void* user_data);
@@ -494,7 +494,7 @@ protected:
 
 public:
 
-   TCPInterface(const MString& name) : SocketInterface(name) {};
+   TCPInterface(const MessageString& name) : SocketInterface(name) {};
    virtual void send(const u_char*, int size);
 };
 
@@ -513,7 +513,7 @@ public:
 
 
    const string& gettype() { return name; }
-   Interface* newInterface(const MString& name) {
+   Interface* newInterface(const MessageString& name) {
 		TCPInterface* in = new TCPInterface(name);
 		in -> open();
 		return in;
@@ -532,7 +532,7 @@ protected:
 
 public:
 
-   UDPInterface(const MString& name) : SocketInterface(name) {  };
+   UDPInterface(const MessageString& name) : SocketInterface(name) {  };
 	void send(const u_char* buf, int size);
 };
 
@@ -545,7 +545,7 @@ public:
    static const string name;
 
    const string& gettype() { return UDPDevice :: name; }
-   Interface* newInterface(const MString& name) {
+   Interface* newInterface(const MessageString& name) {
 		UDPInterface* in = new UDPInterface(name);
 		in -> open();
 		return in;

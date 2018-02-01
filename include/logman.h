@@ -22,7 +22,7 @@
 #include <sstream>
 #include <vector>
 #include "string.h"
-#include "mstring.h"
+#include "messagestring.h"
 
 class Logman;
 
@@ -72,8 +72,8 @@ public:
 
 private:
 
-	MString filename;
-	vector<MString> records;
+	MessageString filename;
+	vector<MessageString> records;
 	HANDLE multipleThreadsAccess;
 	UInt maxNumberOfRecords;
 
@@ -81,7 +81,7 @@ private:
 
 		WaitForSingleObject(multipleThreadsAccess, INFINITE);
 
-		MString s;
+		MessageString s;
 		s.assign(str);
 		records.push_back(s);
 

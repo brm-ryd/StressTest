@@ -1,4 +1,4 @@
-#include "mstring.h"
+#include "messagestring.h"
 #include "exceptions.h"
 #include "stdafx.h"
 

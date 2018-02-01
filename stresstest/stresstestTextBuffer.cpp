@@ -1,18 +1,18 @@
 #include "stdafx.h"
 #include "stresstestTextBuffer.h"
 
-MString StresstestTextBuffer :: lineFeedSubstitution = "\n";
+MessageString StresstestTextBuffer :: lineFeedSubstitution = "\n";
 DefaultFormatNumber StresstestTextBuffer :: defaultFormatNumber = ND_DEC;
 vector<ValueType const*> StresstestTextBuffer :: knownValueTypes;
 
-bool StresstestTextBuffer :: isEnclosedInApostrophes(const MString& word) {
+bool StresstestTextBuffer :: isEnclosedInApostrophes(const MessageString& word) {
 
 	if (word.size() < 2) return false;
 	if ((word[0] == '\'' || (word.size() > 2 && word[0] == '.' && word[1] == '\'')) && word[word.size() - 1] == '\'') return true;
 	return false;
 }
 
-bool StresstestTextBuffer :: isQuoted(const MString& word) {
+bool StresstestTextBuffer :: isQuoted(const MessageString& word) {
 
 	if (word.size() < 2) return false;
 	if ((word[0] == '\'' || (word.size() > 2 && word[0] == '.' && word[1] == '\'')) && word[word.size() - 1] == '\'') return true;
@@ -20,7 +20,7 @@ bool StresstestTextBuffer :: isQuoted(const MString& word) {
 	return false;
 }
 
-const ValueType* StresstestTextBuffer :: getValueTypeByName(const MString& name) {
+const ValueType* StresstestTextBuffer :: getValueTypeByName(const MessageString& name) {
 
    for (int i = 0; i < knownValueTypes.size(); i++) {
       if (name == knownValueTypes[i] -> getName()) {
@@ -30,7 +30,7 @@ const ValueType* StresstestTextBuffer :: getValueTypeByName(const MString& name)
 	return 0;
 }
 
-void StresstestTextBuffer :: removeEnclosingCommas(MString* word) {
+void StresstestTextBuffer :: removeEnclosingCommas(MessageString* word) {
 
 	if (word -> size() < 2) return;
 
@@ -203,14 +203,14 @@ void StresstestTextBuffer :: pass_space() {
 	catch (OutOfBufferBorders* e) { delete e; }
 }
 
-MString& StresstestTextBuffer :: nextWord(MString& word, bool failOnEmptyWord) throw(Exception*) {
+MessageString& StresstestTextBuffer :: nextWord(MessageString& word, bool failOnEmptyWord) throw(Exception*) {
 
    int i;
 	bool apos = false;		// true: apostrophes enclosed text is currently being read
 	bool quotes = false;		// true: quoted text is currently being read
-   bool com1 = false;	// comments after // 
+   bool com1 = false;	// comments after //
    bool com2 = false;	// comments between /* */
-	MString nextWord;
+	MessageString nextWord;
 
 	word = "";
 	nextWord = ""; // ATTENTION: must be filled synchronously to 'word'
@@ -275,7 +275,7 @@ MString& StresstestTextBuffer :: nextWord(MString& word, bool failOnEmptyWord) t
 
          if (!com2 && !com1) {
 
-				MString symbolReplacement;
+				MessageString symbolReplacement;
 
 				symbolReplacement.resize(1);
 				symbolReplacement.at(0) = text[pos];

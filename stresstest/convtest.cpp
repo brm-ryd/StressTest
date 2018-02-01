@@ -4,7 +4,7 @@
 #include "stresstest_script.h"
 
 Convtest :: Convtest() {
-		
+
 	needBreak = false;
 	file = Null;
 	device = Null;
@@ -13,7 +13,7 @@ Convtest :: Convtest() {
 	interaction = Null;
 
 	defaultTimeout = SendingControl :: defaultTimeout;
-	
+
 	setDefaultParameters();
 }
 
@@ -24,7 +24,7 @@ void Convtest :: setDefaultParameters() {
 	stopPacket = 0;
 
 	timedMode = false;
-	
+
 	//defaultTimeout = SendingControl :: defaultTimeout;
 	defaultNumberOfRetransmitions = 1;
 
@@ -41,17 +41,17 @@ Convtest :: ~Convtest() {
 
 	vector<EndPoint> :: iterator i;
 
-	for ( i = generatingEPs.begin() ; i != generatingEPs.end(); i++) 
+	for ( i = generatingEPs.begin() ; i != generatingEPs.end(); i++)
 		delete (*i).f;
 
-	for ( i = receivingEPs.begin() ; i != receivingEPs.end(); i++) 
+	for ( i = receivingEPs.begin() ; i != receivingEPs.end(); i++)
 		delete (*i).f;
 }
 
 
 void Convtest :: addRepMaker(Script* text, bool onlyReadText) {
 
-	MString word;	
+	MessageString word;
 	bool isRecv = false;
 
 	try
@@ -79,14 +79,14 @@ void Convtest :: addRepMaker(Script* text, bool onlyReadText) {
 	{
 		//word = text -> read_word(true);
 		text -> readNameEntity(&word);
-		field1 = new CommonField(*fields, !word);		
+		field1 = new CommonField(*fields, !word);
 		field2 = new CommonField(*fields, !word);
 	}
 	ADD_TO_ERROR_DESCRIPTION("reading the name of field which value will be replaced");
 
 	try
 	{
-		//word = text -> read_word(true);		
+		//word = text -> read_word(true);
 		processValueDefinition(text, field1);
 	}
 	ADD_TO_ERROR_DESCRIPTION("reading the sought value for given field");
@@ -112,17 +112,17 @@ void Convtest :: addRepMaker(Script* text, bool onlyReadText) {
 
 
 void Convtest :: addARepMaker(const CommonField& field) {
-				
+
 	AdaptiveRepmaker arm;
 	if (repMakers.size() < 2) {
 
 		throw new Exception("needs at least two replacement definitions before");
 	}
 
-	if (repMakers[repMakers.size() - 2].status != RM_REC) 
+	if (repMakers[repMakers.size() - 2].status != RM_REC)
 		throw new Exception("the next to last defined replacement must has the type of receiving");
 
-	if (repMakers[repMakers.size() - 1].status != RM_GEN) 
+	if (repMakers[repMakers.size() - 1].status != RM_GEN)
 		throw new Exception("the last defined replacement must has the type of generating");
 
 	if (!(repMakers[repMakers.size() - 1].rm.getTargetVal() -> getSizeField()
@@ -148,8 +148,8 @@ void Convtest :: addARepMaker(const CommonField& field) {
 
 void Convtest :: processValueDefinition(Script* text, CommonField* field) {
 
-	//MString word;
-	MString value;
+	//MessageString word;
+	MessageString value;
 
 	check(field);
 	//check(*field);
@@ -157,7 +157,7 @@ void Convtest :: processValueDefinition(Script* text, CommonField* field) {
 	int kwID = text -> readValue(&value, true, false);
 
 	if (kwID == KW_FIRST || kwID == KW_SECOND) {
-		
+
 		// processes some special value
 
 		const UInt n = 2;
@@ -171,7 +171,7 @@ void Convtest :: processValueDefinition(Script* text, CommonField* field) {
 		UInt numRequiredField = 0;
 		if (value == "second") numRequiredField = 1;
 
-		if (numFound <= numRequiredField) 
+		if (numFound <= numRequiredField)
 			throw new Exception("too few packets with fields of given type in file (total = %u)", numFound);
 
 		//delete *field;
@@ -184,7 +184,7 @@ void Convtest :: processValueDefinition(Script* text, CommonField* field) {
 	else {
 
 		// processes common value (numbers and others)
-				
+
 		field -> readValue(!value);
 	}
 }
@@ -199,7 +199,7 @@ void Convtest :: addEndPoint(Script* text, bool onlyReadText) {
 	userCheck(device);
 	userCheck(file);
 
-	MString word;	
+	MessageString word;
 
 	// processes the destination type of end point
 
@@ -207,8 +207,8 @@ void Convtest :: addEndPoint(Script* text, bool onlyReadText) {
 	{
 		//word = text -> read_word(true);
 		int kwID = text -> readValue(&word, true, false);
-		
-		if (kwID == KW_RECV_POINT) 
+
+		if (kwID == KW_RECV_POINT)
 
 			recvEP = true;
 
@@ -220,7 +220,7 @@ void Convtest :: addEndPoint(Script* text, bool onlyReadText) {
 		}
 	}
 	ADD_TO_ERROR_DESCRIPTION("reading the type of end point");
-	
+
 	// processes the number of interface
 
 	text -> read_word(word, true);
@@ -234,7 +234,7 @@ void Convtest :: addEndPoint(Script* text, bool onlyReadText) {
 	{
 		//word = text -> read_word(true);
 		text -> readNameEntity(&word);
-		field = new CommonField(*fields, !word);	
+		field = new CommonField(*fields, !word);
 	}
 	ADD_TO_ERROR_DESCRIPTION("reading the name of field for end point");
 
@@ -242,7 +242,7 @@ void Convtest :: addEndPoint(Script* text, bool onlyReadText) {
 
 	try
 	{
-		//word = text -> read_word(true);		
+		//word = text -> read_word(true);
 		processValueDefinition(text, field);
 	}
 	ADD_TO_ERROR_DESCRIPTION("reading the value of field");
@@ -276,7 +276,7 @@ void Convtest :: run() {
 	EndPoint* recvEps = new EndPoint[receivingEPs.size()];
 
 	userCheck(device);
-	userCheck(file);	
+	userCheck(file);
 
 	vector<EndPoint> :: iterator ep;
 
@@ -292,17 +292,17 @@ void Convtest :: run() {
 
 		recvEps[i].f = (*ep).f;
 		recvEps[i].interfaceNum = (*ep).interfaceNum;
-	}		
+	}
 
 	interaction = new ConvImit();
 
 	interaction -> setReceiveEPs(recvEps, receivingEPs.size());
-	interaction -> setSendEPs(genEps, generatingEPs.size());	
+	interaction -> setSendEPs(genEps, generatingEPs.size());
 
 	interaction -> setFile(file);
 	interaction -> setDevice(device);
 	interaction -> setTimeout(defaultTimeout);
-	interaction -> setNumberOfRetransmitions(defaultNumberOfRetransmitions);	
+	interaction -> setNumberOfRetransmitions(defaultNumberOfRetransmitions);
 
 	interaction -> setReferenceToExternalReplaces(&repMakers);
 	interaction -> setReferenceToExternalARepMakers(&arepMakers);
@@ -311,13 +311,13 @@ void Convtest :: run() {
 	interaction -> setPacketRange(startPacket, stopPacket);
 	interaction -> sender.timed_mode = timedMode;
 
-	interaction -> reset();	
+	interaction -> reset();
 
 	runConvtest();
 
 	lastResult = interaction -> sender.result;
 
-	delete interaction;	
+	delete interaction;
 
 	interaction = Null;
 
@@ -352,12 +352,12 @@ void Convtest :: runConvtest() {
 
 #ifdef WIN32
 	u_int start_time = GetTickCount();
-#else		
+#else
 	struct timespec timeout;
 	struct timeval now;
 	TimeStamp start_time;
 	check(-1 != gettimeofday((struct timeval*)&start_time,0));
-#endif	
+#endif
 
 	for (;;) {
 
@@ -367,11 +367,11 @@ void Convtest :: runConvtest() {
 
 			//printf("waits for %i milliseconds\n", waitInterval);
 			packetReceivedEvent.wait(waitInterval/1000);
-		} 
+		}
 		else firstPacket = false;
-		
+
 #ifdef WIN32
-		u_int time = GetTickCount() - start_time;      
+		u_int time = GetTickCount() - start_time;
 		time_stamp.sec = time / 1000;
       time_stamp.usec = (time % 1000) * 1000;
 #else
@@ -392,7 +392,7 @@ void Convtest :: runConvtest() {
 				numActiveInteractions--;
 				if (!numActiveInteractions) break;
 				else continue;
-			} 
+			}
 			else {
 
 				if (t < waitInterval) waitInterval = t;
@@ -400,5 +400,5 @@ void Convtest :: runConvtest() {
 		}
 
 		if (!numActiveInteractions) break;
-	} 	  
+	}
 }

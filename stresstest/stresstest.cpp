@@ -1,5 +1,5 @@
 #include "stresstest.h"
-#include "mstring.h"
+#include "messagestring.h"
 #include "stresstest_script.h"
 #include "network.h"
 #include "stresstest_config.h"
@@ -77,7 +77,7 @@ Examples:\n\n\
 
 #define OPTION_STRING "f:c:d:vit:rpwqI:T:u:ks:"
 
-const char USAGE_STR[] = {"version " STRESSTEST_VERSION " build" STRESSTEST_BUILD "\n" "compiled " __DATE__ " " __TIME__ "\n" 
+const char USAGE_STR[] = {"version " STRESSTEST_VERSION " build" STRESSTEST_BUILD "\n" "compiled " __DATE__ " " __TIME__ "\n"
    USAGE_STR1};
 
 // the following objects are declared globally in order to their destructors ALWAYS be called when program terminates
@@ -109,14 +109,14 @@ int main(int argc, char* argv[])
 		Script globalScript(*globalDevice, globalRas, globalTraceFile, autocalcManager, SR_NOINIT);
 
 		registerGlobalObjects(globalDevice, &globalRas, &globalScript);
-		
+
 		vector<Device*> devices = ExtendHelper :: getNetworkDevices();
 		devices.push_back(&globalEthernetDevice);
 		devices.push_back(&globalIPDevice);
 		devices.push_back(&globalTCPDevice);
 		devices.push_back(&globalUDPDevice);
 		globalDevice->setDevices(devices);
-		
+
 		StresstestTextBuffer :: setKnownValueTypes(ExtendHelper :: getValueTypes());
 		autocalcManager.setProtocolExperts(ExtendHelper :: getProtocolsExperts());
 		globalScript.setCommandProcessors(ExtendHelper :: getCommandProcessors());
@@ -128,22 +128,22 @@ int main(int argc, char* argv[])
 
 		//globalLog.setMaxNumberOfRecords(1);
 		#ifndef STRESSTEST_FAST
-		MString :: caseSensitive = false;
+		MessageString :: caseSensitive = false;
 		#else
-		MString :: caseSensitive = true;
+		MessageString :: caseSensitive = true;
 		#endif
 		Exception :: useFormattingMessageForCommandLine = true;
 
-	#ifdef WIN32	
+	#ifdef WIN32
 		handleOfMainThread = GetCurrentThread();
-		MString :: caseSensitiveForUseLocale = false;
-	#endif	
-	
-		StresstestConfig conf;   
-		MString script_str;
+		MessageString :: caseSensitiveForUseLocale = false;
+	#endif
+
+		StresstestConfig conf;
+		MessageString script_str;
 
 		//PlaySound("Windows XP Notify.wav", Null, SND_FILENAME|SND_ASYNC);
-		
+
 
 		// initializes random numbers generator
 
@@ -164,11 +164,11 @@ int main(int argc, char* argv[])
 		#ifdef WIN32
 		init_wsa();  // for Windows initializes WSA (sockets)
 		#endif
-				
+
       string devName = globalEthernetDevice.gettype();
 
 		// PARSES COMMAND LINE
-		
+
 		scrfile=0;
 		file_to_trace = 0;
 
@@ -176,14 +176,14 @@ int main(int argc, char* argv[])
 
 		while ( (i=my_getopt(argc,argv,OPTION_STRING)) != EOF) {
 
-			if (i=='w') {  
+			if (i=='w') {
 
 				isWaitKeyPressBeforExit = true;
 			}
 
 			if (i == 's') {
 
-				MString s;
+				MessageString s;
 				UInt n;
 				s = argumentForOption;
 				try
@@ -213,7 +213,7 @@ int main(int argc, char* argv[])
 
 				devName = globalTCPDevice.gettype();
 
-				MString s = argumentForOption;
+				MessageString s = argumentForOption;
 				UInt t;
 				try
 				{
@@ -225,7 +225,7 @@ int main(int argc, char* argv[])
 					TCPDevice :: timeoutInMilliseconds = t;
             else
 					TCPDevice :: timeoutInMilliseconds = INFINITE_WAITING;
-			}			
+			}
 
 			if (i == 'q') {  // disable promisc mode
 
@@ -242,26 +242,26 @@ int main(int argc, char* argv[])
 
 		// third level options
 
-		nextArgIndex = 1;		
-      
+		nextArgIndex = 1;
+
 		while ( (i=my_getopt(argc,argv,OPTION_STRING)) != EOF) {
 
 			if (i == '?') {
 
 				printf("%s",USAGE_STR);
-				throw new Exception("error in parameters");				
+				throw new Exception("error in parameters");
 			}
 
-			if (i == 'u') {     
+			if (i == 'u') {
 
 				int t;
 				t = atoi(argumentForOption);
 				if (!t) {
 
-					throw new Exception("option -u : need number as argument");					
+					throw new Exception("option -u : need number as argument");
 				}
 				globalRas.set_update_interval(t);
-			}			
+			}
 
 			if (i == 'r') {      // sets sniffers mode
 
@@ -277,7 +277,7 @@ int main(int argc, char* argv[])
 
 			if (i == 'f') scrfile = argumentForOption;
 
-			if (i == 'c') {   
+			if (i == 'c') {
 
 				globalRas.addNewTraceFile(argumentForOption);
 
@@ -291,16 +291,16 @@ int main(int argc, char* argv[])
 
 			if (i == 'd') {   // opening adapter
 
-				globalDevice -> openInterface(devName, MString(argumentForOption));
-			}			
+				globalDevice -> openInterface(devName, MessageString(argumentForOption));
+			}
 
 			if (i == 'v') globalRas.verbose = true;  // verbose reports
 
 			if (i == 'k') {
 
 				showFieldsInfo = true;
-			}			
-		}			
+			}
+		}
 
 #ifdef WIN32
 
@@ -308,7 +308,7 @@ int main(int argc, char* argv[])
 		{
 			// reads global configuration
 
-			conf.read(); 
+			conf.read();
 
 			// adds a new search path from configuration
 
@@ -320,7 +320,7 @@ int main(int argc, char* argv[])
 
 				throw new Exception("default path with headers and samples not specified : you will need to use option -I");
 			}
-						
+
 			if (globalDevice -> numOpenedInterfaces() == 0) {
 
 				// user has not specified the type of device and has not opened any interface
@@ -328,8 +328,8 @@ int main(int argc, char* argv[])
 				// reads default type of device and interface from configuration
 
             globalDevice -> openInterface(
-               MString(conf.get_device_type()),
-               MString(conf.get_def_device())
+               MessageString(conf.get_device_type()),
+               MessageString(conf.get_def_device())
             );
 
 				// initializing the device if it's not Ethernet
@@ -345,25 +345,25 @@ int main(int argc, char* argv[])
 
 				// opening interface
 
-            
+
 //				if (globalDevice -> gettype() == DT_ETH || globalDevice -> gettype() == DT_TCP)
 //
 //					if (conf.get_def_device()) {
-//						globalDevice -> openInterface(MString(conf.get_def_device()));
+//						globalDevice -> openInterface(MessageString(conf.get_def_device()));
 //				}
 			}
 		}
 
 		catch (Exception* e) {
-						
+
 			e -> format();
 			printf("\nWarning: error while reading configuration info from registry\n\t%s\nUse \"registry.reg\" file from distribute.\n\n", e -> get_message());
 			delete e;
 		}
 
-#else		
+#else
 		check(conf.get_base_path());
-		globalScript.add_include_path(conf.get_base_path());		
+		globalScript.add_include_path(conf.get_base_path());
 #endif
 
 		// parses the rest of command line: the content of script
@@ -393,7 +393,7 @@ int main(int argc, char* argv[])
 		globalRas.set_device(globalDevice);
 
       #ifdef TEST_MODE
-                        
+
          Testing :: runAllTests();
 
       #endif
@@ -409,14 +409,14 @@ int main(int argc, char* argv[])
 			if (globalDevice -> numOpenedInterfaces() == 0) {
 
 				throw new Exception("need at least one device (-d option)");
-			}		
+			}
 
 			if (!scrfile && !scriptInArgs) {
 
 				throw new Exception("need script file (option -f) or desription of packets in command line");
 			}
 
-			globalScript.reset(SR_SNIFFER);  
+			globalScript.reset(SR_SNIFFER);
 
 			// processing script
 
@@ -430,14 +430,14 @@ int main(int argc, char* argv[])
 				// ... from command-line
 				check(scriptInArgs);
 
-				script_str.append(" SEND");				
+				script_str.append(" SEND");
 				globalScript.run("command line", !script_str);
 			}
 
-			// works with globalRas					
-			
+			// works with globalRas
+
 			globalRas.startConcurrentSniffersOnInterfaces();
-						
+
 			globalRas.displayPeriodicReports();
 
 			myexit(globalRas.getLastStatus());
@@ -452,20 +452,20 @@ int main(int argc, char* argv[])
 		if ((scrfile || scriptInArgs) && !catch_file_given) {
 
 			if (scriptInArgs && !showFieldsInfo) {
-			
+
 				// adds command SEND to the end of packet's description in command-line
 
-				script_str.append(" SEND");			
+				script_str.append(" SEND");
 			}
-         			
+
 			globalRas.startConcurrentSniffersOnInterfaces();
 
-			mysleep(PAUSE_BEFOR_GENERATING);  
-			
+			mysleep(PAUSE_BEFOR_GENERATING);
+
 			// processing script
-			
-			globalScript.reset(SR_GEN); 
-						
+
+			globalScript.reset(SR_GEN);
+
 			if (scrfile) {
 
 				// from file
@@ -487,7 +487,7 @@ int main(int argc, char* argv[])
 			if (globalRas.isAnyRequestsWereSpecified()) {
 
 				globalRas.showStatictic();
-			}		
+			}
 
 			if (showFieldsInfo) {
 
@@ -517,13 +517,13 @@ int main(int argc, char* argv[])
 			}
 
 			forcedTerm = true;
-						
+
 			try
 			{
 				trace_packets_to_file(globalDevice -> getInterface(0), file_to_trace);
 			}
 			ADD_TO_ERROR_DESCRIPTION("while start tracing to file");
-			
+
 			myexit(0);
 		}
 
@@ -532,9 +532,9 @@ int main(int argc, char* argv[])
 		//		WORKS WITH TRACE FILES (option -c is specified)
 		//******************************************************
 		//******************************************************
-				
+
 		globalScript.set_device(globalDevice,0);
-				
+
 		// processes script
 
 		globalScript.reset(SR_STAT);
@@ -544,23 +544,23 @@ int main(int argc, char* argv[])
 
 		globalRas.fill_stat(FS_USEFILES);
 		globalRas.showStatictic();
-			
-		myexit(globalRas.getLastStatus());		
+
+		myexit(globalRas.getLastStatus());
 	}
 
 	catch (SocketInterface :: SendingOverSocketException* e) {
-	
+
 		myexit(3, e);
 	}
 
 	catch (SocketInterface :: ConnectionFailedException* e) {
-	
+
 		myexit(3, e);
 	}
 
 	catch (Exception* e) {
-				
-		myexit(1, e);		
+
+		myexit(1, e);
 	}
 
 	catch (std::bad_alloc &ba) {
@@ -570,4 +570,3 @@ int main(int argc, char* argv[])
 	}
 }
 //---------------------------------------------------------------------------
-

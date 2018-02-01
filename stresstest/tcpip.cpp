@@ -66,7 +66,7 @@ int IpTcpExpert :: findStartIPHeader() {
 	try
 	{
 
-		if (!(fieldParameters = fields -> getField(MString("ip.ver"))))
+		if (!(fieldParameters = fields -> getField(MessageString("ip.ver"))))
 			throw new Exception("field 'ip.ver' must be defined");
 	}
 

@@ -4,7 +4,7 @@
 
 Paths :: Paths () {
 
-	add_path(new MString("."));
+	add_path(new MessageString("."));
 }
 
 Paths :: ~Paths () {
@@ -12,7 +12,7 @@ Paths :: ~Paths () {
 	paths.clear();
 }
 
-MString& Paths :: search(MString& name, const char* filename) {
+MessageString& Paths :: search(MessageString& name, const char* filename) {
 
 	name = filename;
 
@@ -24,7 +24,7 @@ MString& Paths :: search(MString& name, const char* filename) {
 
 			// search in all folders from list
 
-			vector<MString>::iterator it = paths.begin();
+			vector<MessageString>::iterator it = paths.begin();
 			for (; it != paths.end(); it++)
 			{
 				name = *it;

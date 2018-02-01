@@ -62,8 +62,8 @@ public:
 	*/
 	static bool isConditionMet(
 
-		const MString& firstItem,
-		const MString& secondItem,
+		const MessageString& firstItem,
+		const MessageString& secondItem,
 		TypeCompareField typeCompare
 		);
 };

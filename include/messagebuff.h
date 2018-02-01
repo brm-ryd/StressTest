@@ -1,5 +1,5 @@
-#ifndef _DINAMICBUFFER_H_
-#define _DINAMICBUFFER_H_
+#ifndef _DYNAMICBUFFER_H_
+#define _DYNAMICBUFFER_H_
 
 #ifdef WIN32
 #include <stdio.h>
@@ -19,7 +19,7 @@ typedef unsigned int uint;
 typedef unsigned char u_char;
 
 #include "exceptions.h"
-#include "mstring.h"
+#include "messagestring.h"
 
 #define DATA_NOT_FOUND ((UInt)(-1))
 

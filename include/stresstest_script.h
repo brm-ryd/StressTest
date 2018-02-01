@@ -9,7 +9,7 @@
 #include "reqandstat.h"
 #include "paths.h"
 #include "messagebuff.h"
-#include "mstring.h"
+#include "messagestring.h"
 #include "fieldVariableValues.h"
 #include "protocolsExpert.h"
 #include "stresstestTextBuffer.h"
@@ -199,13 +199,13 @@ public:
     * @param command
     * @return
     */
-   virtual boolean isProcessCommand(const MString& command) = 0;
+   virtual boolean isProcessCommand(const MessageString& command) = 0;
    /**
     * returns the description of parameters (printed for user)
     * @param command
     * @return
     */
-   virtual MString getParameters(const MString& command) = 0;
+   virtual MessageString getParameters(const MessageString& command) = 0;
 
    /**
     * processes command. this method may read from script until the list of command's parameters is finished.
@@ -213,7 +213,7 @@ public:
     * @param command
     * @param script
     */
-   virtual void process(const MString& command, Script& script) = 0;
+   virtual void process(const MessageString& command, Script& script) = 0;
 };
 
 /**
@@ -221,7 +221,7 @@ public:
  returns the index of a command or a key word by the given name (see enumeration KEY_WORD_ID)
 */
 int is_keyword(const char* word);
-void printKeyWordInfo(const MString& keyword = "all");
+void printKeyWordInfo(const MessageString& keyword = "all");
 
 
 /**
@@ -231,9 +231,9 @@ void printKeyWordInfo(const MString& keyword = "all");
 struct SubstitutionInfo {
 
 	/** name that will be sought in text */
-	MString name;
+	MessageString name;
 	/** value that replaces the name */
-	MString val;
+	MessageString val;
 };
 
 
@@ -329,10 +329,10 @@ private:
 	UInt timeoutForWaitCommand;
 
 	/** name of current packet, may be empty */
-	MString nameOfCurrentPacket;
+	MessageString nameOfCurrentPacket;
    /** message to display when packet is received
    */
-	MString outputMessageForCurrentPacket;
+	MessageString outputMessageForCurrentPacket;
 
 	/** reference to external object */
 	Network* dev;
@@ -374,7 +374,7 @@ private:
    /**	used for correct processing of fasttest command when it appeares in not top level file,
       but in one from included
    */
-	MString nameTopLevelFile;
+	MessageString nameTopLevelFile;
 
 	/** true: KW_FASTTEST command has been already processed */
 	bool fastTestAlreadyProccessed;
@@ -404,7 +404,7 @@ private:
 	 determines is the given string compare qualifier (ex: >, <, ...) or not
 	 return the type of compare or TCF_UNDEFINED if it's not compare qualifier
 	*/
-	TypeCompareField isCompareQualifier(const MString& word);
+	TypeCompareField isCompareQualifier(const MessageString& word);
 
 	/**
 	 reads the sequence of requests from text (they are parameters to commands: send, wait and others)
@@ -447,7 +447,7 @@ private:
 		);
 
 	/** processes KW_INCLUDE command */
-	void processIncludeCommand(MString& nameIncludedFile);
+	void processIncludeCommand(MessageString& nameIncludedFile);
 
 	/** processes KW_VAR command */
 	void processVarCommand(
@@ -463,7 +463,7 @@ private:
 		);
 
 	/** performs system call */
-	void makeSystemCall(const MString& command);
+	void makeSystemCall(const MessageString& command);
 
 	/** processes KW_ARM command */
 	void processARepMakerCommand();
@@ -471,7 +471,7 @@ private:
    void enableAutoincrement();
 	void disableAutoincrement();
 
-   CommandsProcessor* getProcessor(const MString& command);
+   CommandsProcessor* getProcessor(const MessageString& command);
 
    void runBlock(bool isIdleMode);
 
@@ -541,17 +541,17 @@ public:
 	 searches insertions like $name$ and resolves these names, i.e. inserts their values,
 	 uses method searchEntity for resolving
 	*/
-	void putValuesInMessage(MString* message);
+	void putValuesInMessage(MessageString* message);
 
    /** reads next word from text at low-level,
     *  only global defines are applied
     */
-	MString& read_word(MString& word, bool failOnEmptyWord = false, bool removeEnclosingCommas = false) throw(Exception*);
+	MessageString& read_word(MessageString& word, bool failOnEmptyWord = false, bool removeEnclosingCommas = false) throw(Exception*);
 
 	/**
 	 * reads the name of a entity (field, variable, etc.) when the name is needed, not its value
     */
-	void readNameEntity(MString* word, bool failOnEmptyWord = true, TypeOfEntity typeOfEntity = SE_NOT_DEFINED) {
+	void readNameEntity(MessageString* word, bool failOnEmptyWord = true, TypeOfEntity typeOfEntity = SE_NOT_DEFINED) {
 
 		readEntity(word,        true,          failOnEmptyWord, QP_NOT_PROCESS_QUOTES, true, false, true, typeOfEntity);
 	}
@@ -559,7 +559,7 @@ public:
 	/**
 	 * reads value resolving names of entities, quotes for string values are required, they will stay
     */
-	int readValue(MString* word, bool failOnEmptyWord = true, bool failOnKeyword = true) {
+	int readValue(MessageString* word, bool failOnEmptyWord = true, bool failOnKeyword = true) {
 
 		return readEntity(word, failOnKeyword, failOnEmptyWord, QP_NOT_PROCESS_QUOTES, false);
 	}
@@ -567,7 +567,7 @@ public:
 	/**
 	 * reads value resolving names of entities, quotes for string values are optional and will be removed
     */
-	int readString(MString* word, bool failOnEmptyWord = true) {
+	int readString(MessageString* word, bool failOnEmptyWord = true) {
 
 		return readEntity(word, true,          failOnEmptyWord, QP_REMOVE_OPTIONAL_QUOTES,  false);
 	}
@@ -575,14 +575,14 @@ public:
 	/**
 	 * reads value resolving names of entities, quotes for string values are required and will be removed
     */
-   int readStringRequireQuots(MString* word, bool failOnEmptyWord = true) {
+   int readStringRequireQuots(MessageString* word, bool failOnEmptyWord = true) {
 		return readEntity(word, true,          failOnEmptyWord, QP_REMOVE_OPTIONAL_QUOTES, false, true);
 	}
 
 	/**
 	 * reads string value (only this type) resolving names of entities, quotes for string values are required and will be removed
     */
-	int readStringOnly(MString* word, bool failOnEmptyWord = true) {
+	int readStringOnly(MessageString* word, bool failOnEmptyWord = true) {
 		return readEntity(word, true,          failOnEmptyWord, QP_REMOVE_REQUIRED_QUOTES, false);
 	}
 
@@ -599,7 +599,7 @@ public:
     * @param typeOfEntity see searchEntity method
     * @return
     */
-	int readEntity(MString* word,
+	int readEntity(MessageString* word,
       bool failOnKeyword,
       bool failOnEmptyWord,
       QuotesProccessing quotesProccessing,
@@ -615,7 +615,7 @@ public:
     also resolves some key values
     */
    void searchEntity(
-		MString* name, // [in,out]
+		MessageString* name, // [in,out]
 		QuotesProccessing quotesProccessing = QP_REMOVE_OPTIONAL_QUOTES,
 		bool withTypeInfo = true,			// see method FieldValue :: getValueString which is used hear to retrieve the value of variable, etc
 		bool doNotResolve = false,		// true: don't try to get value of entity, leave the name itself

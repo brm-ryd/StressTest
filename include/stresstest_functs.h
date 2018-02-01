@@ -3,7 +3,7 @@
 
 #include "stresstest.h"
 #include "logman.h"
-#include "mstring.h"
+#include "messagestring.h"
 #include "network.h"
 //#include "reqandstat.h"
 
@@ -18,7 +18,7 @@ extern bool forcedTerm;		// see signal_handler
 // for all project
 /** true - asks for pressing some key before exit (for Windows)
 */
-extern bool isWaitKeyPressBeforExit; 
+extern bool isWaitKeyPressBeforExit;
 
 class FieldVariableValues;
 class Substitutions;
@@ -109,7 +109,7 @@ void trace_packets_to_file (Interface* dev, // device
 									char* tracefile // file's name
 									);
 
-/** 
+/**
  packet handler which writes packet to trace-file,
  * must comply with libpcap packet_handler
  always returns 0
@@ -126,7 +126,7 @@ const char* getStringOfDump1(const u_char* dump, int sizeOfDump);	// uses anothe
 
 /** is similar to Script :: putValuesInMessage */
 void putValuesInMessage(
-								MString& message, 
+								MessageString& message,
 								const Fields* fields = Null,
 								const Substitutions* substitutions = Null,
 								const FieldVariableValues* fieldVariableValues = Null,
@@ -158,6 +158,3 @@ void signal_handler(int sig);
 int my_getopt(int, char **, const char *);
 
 #endif
-
-
-

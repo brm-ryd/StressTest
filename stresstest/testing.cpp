@@ -63,15 +63,15 @@ void Testing :: runAllTests() {
 
 		cout << "Self-test is finished with mismatches\n";
 		printf(e -> get_message());
-		getchar();       
-	}      
+		getchar();
+	}
 }
 
 
 void Testing :: test1() {
 
 	u_char dump[100];
-	
+
 	// field with size = 1
 
 	scr -> run("filename",
@@ -81,7 +81,7 @@ void Testing :: test1() {
 		  field 0x56"
 		);
 
-	scr -> buf -> cpyBuf(dump, 100);				
+	scr -> buf -> cpyBuf(dump, 100);
 	check(!memcmp(dump, "\x56", 1));
 	scr -> buf -> reset();
 
@@ -92,7 +92,7 @@ void Testing :: test1() {
 		  field 0x56"
 		);
 
-	scr -> buf -> cpyBuf(dump, 100);				
+	scr -> buf -> cpyBuf(dump, 100);
 	check(!memcmp(dump, "\x50", 1));
 	scr -> buf -> reset();
 
@@ -103,7 +103,7 @@ void Testing :: test1() {
 		  field 0x56"
 		);
 
-	scr -> buf -> cpyBuf(dump, 100);				
+	scr -> buf -> cpyBuf(dump, 100);
 	check(!memcmp(dump, "\x06", 1));
 	scr -> buf -> reset();
 
@@ -116,7 +116,7 @@ void Testing :: test1() {
 		  field 0x1256"
 		);
 
-	scr -> buf -> cpyBuf(dump, 100);				
+	scr -> buf -> cpyBuf(dump, 100);
 	check(!memcmp(dump, "\x10\x06", 2));
 	scr -> buf -> reset();
 
@@ -129,7 +129,7 @@ void Testing :: test1() {
 		  field 0x112233445566778899aabbcc"
 		);
 
-	scr -> buf -> cpyBuf(dump, 100);				
+	scr -> buf -> cpyBuf(dump, 100);
 	check(!memcmp(dump, "\x11\x22\x30\x44\x55\x66\x77\x88\x99\xaa\xb0\xcc", 12));
 	scr -> buf -> reset();
 
@@ -141,7 +141,7 @@ void Testing :: test1() {
 		  field 0x112233445566778899aabbcc"
 		);
 
-	scr -> buf -> cpyBuf(dump, 100);				
+	scr -> buf -> cpyBuf(dump, 100);
 	check(!memcmp(dump, "\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x0b\x00", 12));
 	scr -> buf -> reset();
 
@@ -154,7 +154,7 @@ void Testing :: test1() {
 		  field 32"
 		);
 
-	scr -> buf -> cpyBuf(dump, 100);				
+	scr -> buf -> cpyBuf(dump, 100);
 	check(!memcmp(dump, "\x20", 1));
 	scr -> buf -> reset();
 
@@ -167,7 +167,7 @@ void Testing :: test1() {
 		  field 20054"
 		);
 
-	scr -> buf -> cpyBuf(dump, 100);				
+	scr -> buf -> cpyBuf(dump, 100);
 	check(!memcmp(dump, "\x0e\x00", 2));
 	scr -> buf -> reset();
 
@@ -180,7 +180,7 @@ void Testing :: test1() {
 		  field 0x4455"
 		);
 
-	scr -> buf -> cpyBuf(dump, 100);				
+	scr -> buf -> cpyBuf(dump, 100);
 	check(!memcmp(dump, "\x00\x55", 2));
 	scr -> buf -> reset();
 
@@ -193,7 +193,7 @@ void Testing :: test1() {
 		  field 0x4455"
 		);
 
-	scr -> buf -> cpyBuf(dump, 100);				
+	scr -> buf -> cpyBuf(dump, 100);
 	check(!memcmp(dump, "\x44\x55", 2));
 	scr -> buf -> reset();
 }
@@ -206,31 +206,31 @@ void Testing :: test2() {
 
 	// one-byte value
 
-	scr -> run("filename", 
+	scr -> run("filename",
 		".field1 0x33 \
 		.field2 0x45 \
 		INC \
 		field2 0x45");
 
-	scr -> buf -> cpyBuf(dump, 100);				
+	scr -> buf -> cpyBuf(dump, 100);
 	check(!memcmp(dump, "\x33\x45", 2));
 
 	scr -> performAutoincrement();
-	scr -> buf -> cpyBuf(dump, 100);				
+	scr -> buf -> cpyBuf(dump, 100);
 	check(!memcmp(dump, "\x33\x46", 2));
 
 	scr -> performAutoincrement();
-	scr -> buf -> cpyBuf(dump, 100);				
+	scr -> buf -> cpyBuf(dump, 100);
 	check(!memcmp(dump, "\x33\x47", 2));
 
 	scr -> performAutoincrement();
-	scr -> buf -> cpyBuf(dump, 100);				
+	scr -> buf -> cpyBuf(dump, 100);
 	check(!memcmp(dump, "\x33\x48", 2));
 
-	for (int i = 0; i < 255; i++) 
+	for (int i = 0; i < 255; i++)
 		scr -> performAutoincrement();
 
-	scr -> buf -> cpyBuf(dump, 100);				
+	scr -> buf -> cpyBuf(dump, 100);
 	check(!memcmp(dump, "\x33\x47", 2));
 
 
@@ -238,18 +238,18 @@ void Testing :: test2() {
 
 	// two-bye value
 
-	scr -> run("filename", 
+	scr -> run("filename",
 		".field1 0x33 \
 		 .field2 0x6677 \
 		 INC \
 		 field2 32");
 
-	scr -> buf -> cpyBuf(dump, 100);				
+	scr -> buf -> cpyBuf(dump, 100);
 	check(!memcmp(dump, "\x33\x00\x20", 3));
 
 	scr -> performAutoincrement();
-	scr -> buf -> cpyBuf(dump, 100);				
-	check(!memcmp(dump, "\x33\x00\x21", 3));	
+	scr -> buf -> cpyBuf(dump, 100);
+	check(!memcmp(dump, "\x33\x00\x21", 3));
 
 //	for (int i = 0; i < 65000; i++)
 //		scr -> performAutoincrement();
@@ -267,14 +267,14 @@ void Testing :: test2() {
 
 	scr -> buf -> reset();
 
-	scr -> run("filename", 
+	scr -> run("filename",
 		".field1 0x33 \
 		 OFFSET 4 \
 		 .field2 0x6677 \
 		 INC \
 		 field2 32");
 
-	scr -> buf -> cpyBuf(dump, 100);				
+	scr -> buf -> cpyBuf(dump, 100);
 	check(!memcmp(dump, "\x33\x02\x00", 3));
 
 	scr -> performAutoincrement();
@@ -287,10 +287,10 @@ void Testing :: test3() {
 
 		u_char dump[100];
 
-	
-   
 
-	scr -> run("filename", 
+
+
+	scr -> run("filename",
 		"OFFSET 2 \
 		.field1 0x10 \
 		field1 3 \
@@ -303,7 +303,7 @@ void Testing :: test3() {
 
 	scr -> buf -> reset();
 
-	scr -> run("filename", 
+	scr -> run("filename",
 		"\
 		.field2 0x10 \
 		field2 0xcc \
@@ -321,13 +321,13 @@ void Testing :: test4() {
 
 		u_char dump[100];
 
-	
-   
+
+
 
 	// simple fields
 
 	scr -> buf -> reset();
-	scr -> run("filename", 
+	scr -> run("filename",
 		"\
 		POS 3	 \
 		.field 0x56 \
@@ -335,7 +335,7 @@ void Testing :: test4() {
 		");
 
 	scr -> buf -> cpyBuf(dump, 100);
-	check(!memcmp(dump, "\x00\x00\x00\x38", 4));	
+	check(!memcmp(dump, "\x00\x00\x00\x38", 4));
 
 	scr -> buf -> reset();
 	scr -> run("filename",
@@ -514,7 +514,7 @@ void Testing :: test5() {
        p1='$n1$'\
 		");
    CHECK_VAR("p1", "11:22:33:44:55:66:77:88 :: 99:aa:bb:cc:dd:ee:ff:11\n00");
-   
+
 }
 
 void Testing :: testShortVarDefines() {
@@ -544,8 +544,8 @@ void Testing :: testShortVarDefines() {
 }
 
 void Testing :: checkVar(const TCHAR* var, const TCHAR* val) {
-   MString aval = scr -> getVariables().getVariable_const(MString(var)) -> getValueConst().getValueString(false);
-   check(aval == MString(val));
+   MessageString aval = scr -> getVariables().getVariable_const(MessageString(var)) -> getValueConst().getValueString(false);
+   check(aval == MessageString(val));
 }
 
 void Testing :: fieldValueTest() {

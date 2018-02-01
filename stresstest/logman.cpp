@@ -44,10 +44,10 @@ void Logman :: flush() {
 	{
 
 		DWORD numWrittenBytes;
-		vector<MString>::iterator it = records.begin();
+		vector<MessageString>::iterator it = records.begin();
 		for (; it != records.end(); it++) {
 
-			//MString curRecord = *it;
+			//MessageString curRecord = *it;
 			check(WriteFile(logFile, !(*it), it -> len(), &numWrittenBytes, 0));
 			check(WriteFile(logFile, "\r\n", 2, &numWrittenBytes, 0));
 		}
@@ -64,8 +64,8 @@ void Logman :: flush() {
 
 	catch (Exception* e) {
 
-		MString processName;
-		MString mes;
+		MessageString processName;
+		MessageString mes;
 
 		ReleaseMutex(multipleThreadsAccess);
 
@@ -87,9 +87,9 @@ void Logman :: flush() {
 
 void Logman :: add(const TCHAR* str) {
 
-	MString finalString;
-	MString systemDateString;
-	MString systemTimeString;
+	MessageString finalString;
+	MessageString systemDateString;
+	MessageString systemTimeString;
 	SYSTEMTIME systemTime;
 	GetLocalTime(&systemTime);
 

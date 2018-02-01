@@ -113,7 +113,7 @@ KeyWordsInfo key_words[]=
  {"WRITEVAR","<name of variable> <name of file>","Writes variable's value to the file on disk."},
  {"IFDEF","<name of entity> \"{\" <script's block> \"}\"","Executes block if given entity has been defined (entity: variable, field, someone defined by GDEF or DEFINE commands)."},
  {"PLAY","<name of wav file>","Windows only. Plays the specified sound, WAV-file. Sound system must be enabled. If the file is not found then default Windows sound will be played. If the file is in current folder or in standard system folder then the full path is not required (Media/<name>). \nUnder UNIX the sound will be played by PC speaker."},
- {"NEWLINEIS","<string>","Sets the string which must replace any original LF symbol while working with strings. See \"samples/strings.fws\""}, 
+ {"NEWLINEIS","<string>","Sets the string which must replace any original LF symbol while working with strings. See \"samples/strings.fws\""},
  {"SENDWAITOTHER","no parameters","Works similar to \"SEND WAITALL\" sentence. Purpose: make atomic operation. Without this command there would be a chance that a waited packet did not cause command WAITALL stop waiting if it was accepted after SEND but before WAITALL started waiting. However it would be registered as received in any case. This command should be always used when you need to send a request and RELIABLY receive a response on it never missing."},
  {"OPEN","<interface's type> <interface's name>","Opens interface of given type. Types: eth, ip, tcp, udp. For tcp this command will wait till connection with server is established or a client connection is accepted. For other types the command won't wait. See more in -d,-p,-T options."},
  {"CLOSE","<interface's name>","Closes interface with given name."},
@@ -132,7 +132,7 @@ KeyWordsInfo key_words[]=
 
 void Script :: add_include_path(const char* path) throw(Exception*) {
 
-	try { includePaths.add_path(new MString(path)); }
+	try { includePaths.add_path(new MessageString(path)); }
 	ADD_TO_ERROR_DESCRIPTION("adding new path for searching header files");
 }
 
@@ -143,7 +143,7 @@ void Script :: setCommandProcessors(vector<CommandsProcessor*> givenCommandProce
 Script :: Script(Network& device, ReqAndStat& externRas, TraceFile& traceFile, AutocalcManager& autocalcManager, u_char regime)
 {
 
-	// ATTENTION: most of parameters must be also initialized in method 'reset'	
+	// ATTENTION: most of parameters must be also initialized in method 'reset'
 
    this -> autocalcManager = &autocalcManager;
 
@@ -154,7 +154,7 @@ Script :: Script(Network& device, ReqAndStat& externRas, TraceFile& traceFile, A
    numIterations = 1;
 
 	needBreakCycle = false;
-	
+
 	dataWasFound = false;
 
 	fastTestAlreadyProccessed = false;
@@ -171,21 +171,21 @@ Script :: Script(Network& device, ReqAndStat& externRas, TraceFile& traceFile, A
 
 	extendedRegime = false;
 
-	autoIncrementedField = 0;	
+	autoIncrementedField = 0;
 
-	text = 0;	
+	text = 0;
 	reg = regime;
    ras = 0;
-   dev = 0;      
+   dev = 0;
 	buf = 0;
 
-	autoincrementEnabled = false;		
+	autoincrementEnabled = false;
 
 	ras = &externRas;
-	ras -> fields = &fields;	
+	ras -> fields = &fields;
 	ras -> substitutions = &globalDefines;
 	ras -> fieldVariableValues = &variables;
-	ras -> convtest = &convtest;		
+	ras -> convtest = &convtest;
 
 	set_device(&device, 0);
 
@@ -252,7 +252,7 @@ void Script :: reset(UChar newRegime) {
 
 		reg = SR_GEN; // set this regime temporally
 
-		MString fullNameIncludedFile;
+		MessageString fullNameIncludedFile;
       includePaths.search(fullNameIncludedFile, "base.fws");
 
 		if (fullNameIncludedFile.size()) {
@@ -282,7 +282,7 @@ Script :: ~Script () {
 
 	if (autoIncrementedField) delete autoIncrementedField;
 	autoIncrementedField = 0;
-	if (buf) delete buf;	
+	if (buf) delete buf;
 }
 
 void Script :: enableAutoincrement() {
@@ -307,7 +307,7 @@ void Script :: set_device (Network* dev, int mainInterfaceNum) {
    if (dev == Null || dev -> numOpenedInterfaces() == 0) {
       buf = new SequenceOfPackets(0x7fffffff, 0, *autocalcManager);
    }
-   else {      
+   else {
       Device* dev1 = dev -> getInterface(getMainInterfaceNum()) -> getDevice();
       buf = new SequenceOfPackets(dev1 -> getSizeLimit(), dev1 -> getPositionDataBegins(), *autocalcManager);
    }
@@ -320,30 +320,30 @@ void Script :: newpac () {
 	interval = 0;
 
 	numberOfGenerations = 1;
-	
+
 	disableAutoincrement();
 
-	nameOfCurrentPacket = "";	
+	nameOfCurrentPacket = "";
 	outputMessageForCurrentPacket = "";
 
 	if (buf) buf -> startNewPacket();
 }
 
 void Script :: prepare_packet() {
-	
+
 	try {
 
 		buf -> calcAllAutoCalcValues();
 	}
 
-	catch (Exception* e) {		
+	catch (Exception* e) {
 
-		if (!ras -> quietMode) printf("Warning: %s\n", e -> get_message());		
+		if (!ras -> quietMode) printf("Warning: %s\n", e -> get_message());
 		delete e;
-	}	
+	}
 }
-	
-CommandsProcessor* Script :: getProcessor(const MString& command) {
+
+CommandsProcessor* Script :: getProcessor(const MessageString& command) {
    for (int i = 0; i < commandProcessors.size(); i++) {
       if (commandProcessors[i] -> isProcessCommand(command))
          return commandProcessors[i];
@@ -370,8 +370,8 @@ void Script :: run(
 						 ) throw(Exception*)
 {
 
-	MString word;	
-	//MString nameOfSource;
+	MessageString word;
+	//MessageString nameOfSource;
 	StresstestTextBuffer reserveText;
 	int numBlocksDepth = 0;
 	bool cycleWasBefore = false;
@@ -385,18 +385,18 @@ void Script :: run(
 		if (textToProcess) {
 
 			userCheck(filename);
-			
+
 			lastText = text;
 			reserveText.setText(textToProcess, filename);
 			text = &reserveText;
 		}
 
-		if (nameTopLevelFile.size() == 0) nameTopLevelFile = text -> getNameSource();		
+		if (nameTopLevelFile.size() == 0) nameTopLevelFile = text -> getNameSource();
 
 		userCheck(text);
 		if (reg == SR_NOINIT)
          throw new Exception("script is not initialized (by reset method)");
-		userCheck(buf);		
+		userCheck(buf);
 
 		if (reg != SR_STAT) check(dev);
 		check(ras);
@@ -413,7 +413,7 @@ void Script :: run(
 			if (needBreak) break;
 
 			// reads next word
-			
+
 			if (!isIdleMode) {
 
 				kw_id = readEntity(&word, false, false, QP_NOT_PROCESS_QUOTES, true);
@@ -443,7 +443,7 @@ void Script :: run(
             valueType = text -> getValueTypeByName(word);
             if (valueType) found = true;
          }
-         
+
          if (!found) {
             comProcessor = getProcessor(word);
             if (comProcessor) found = true;
@@ -458,9 +458,9 @@ void Script :: run(
             foundVariable = variables.getVariable(!word, false);
             if (foundVariable) found = true;
          }
-									 
+
 			// processes block's borders
-			
+
 			if (kw_id == KW_START_BLOCK) {
 
 				ADDTOLOG3("block start : line %u : num %i", text -> getLineNumber(), numBlocksDepth);
@@ -482,9 +482,9 @@ void Script :: run(
 
 			if (kw_id == KW_EXIT) {
 
-				MString s;
+				MessageString s;
 				UInt lastStatus;
-            
+
 				try {
 
 					try
@@ -500,16 +500,16 @@ void Script :: run(
 				}
 				ADD_TO_ERROR_DESCRIPTION2("command %s", key_words[KW_EXIT].keyword);
 
-				break;			
+				break;
 			}
 
-			try 
+			try
 			{
 
 			if (kw_id != -1) {
 
 				ADDTOLOG2("script :: run -- command %s", key_words[kw_id]);
-				
+
 				processDeprecatedCommands(kw_id);
 
 				text -> clearLastComments();
@@ -520,23 +520,23 @@ void Script :: run(
 
 				bool bracketWasTyped = false; // stores the fact that there was ( before parameters
 
-				MString w1;
+				MessageString w1;
 				read_word(w1);
-				if (w1 != "(" && w1 != "=") 
+				if (w1 != "(" && w1 != "=")
 					text -> restoreKeptPosition();
 				else {
 
-					if (w1 == "(") bracketWasTyped = true;				
+					if (w1 == "(") bracketWasTyped = true;
 				}
 
 				// processes commands
 
 				switch (kw_id) {
-					
+
 					case KW_NEWLINEIS: {
 
-						MString lineFeedSubstitution;
-												
+						MessageString lineFeedSubstitution;
+
 						read_word(lineFeedSubstitution, true, true);
 						text -> setLineFeedSubstitution(!lineFeedSubstitution);
 						break;
@@ -544,7 +544,7 @@ void Script :: run(
 
 					case KW_PLAY: {
 
-						MString filename;
+						MessageString filename;
 
 						try
 						{
@@ -583,18 +583,18 @@ void Script :: run(
 					case KW_IFDEF:
 					case KW_IFNDEF: {
 
-						MString word;
+						MessageString word;
 						bool found = false;
-												
+
 						text -> nextWord(word, true);		// performs raw read, global defines must not be implemented
-						
+
                   putValuesInMessage(&word);
-												
+
 						if (!found && variables.getVariable(!word, false)) found = true;
 						if (!found && fields.getField(word)) found = true;
 						if (!found && globalDefines.search_value(!word)) found = true;
 						if (!found && defines.search_value(!word)) found = true;
-						
+
 						read_word(word, true, false);
 						int kwID = is_keyword(!word);
 						if (kwID != KW_START_BLOCK) {
@@ -604,7 +604,7 @@ void Script :: run(
 
 						if (kw_id != KW_IFDEF)
 							runBlock(found);
-						else 
+						else
 							runBlock(!found);
 
 						break;
@@ -612,23 +612,23 @@ void Script :: run(
 
 					case KW_CIEVE: {
 
-						MString word;
+						MessageString word;
 
 						try
-						{								
+						{
 							readNameEntity(&word, true);
                      CommonField f(*fields.getFieldEx(word));
                      convtest.addCieve(f);
 						}
 						ADD_TO_ERROR_DESCRIPTION("adding new cieve");
-						
+
 						break;
 					}
 
 					case KW_RETURN:
 						throw new ReturnException();
 						break;
-					
+
                case KW_BREAK:
 
                   needBreakCycle = true;
@@ -636,11 +636,11 @@ void Script :: run(
 
 					case KW_SETPOS: {
 
-						MString nameOfField;
-						MString value;
+						MessageString nameOfField;
+						MessageString value;
 
 						try
-						{								
+						{
 							readNameEntity(&nameOfField, true);
 						}
 						ADD_TO_ERROR_DESCRIPTION("reading the field's name");
@@ -661,23 +661,23 @@ void Script :: run(
 					case KW_GOTOB:
 					case KW_GOTO: {
 
-						MString s;
+						MessageString s;
 						RefHolder<FieldValue> v;
 						UInt stopPosition = (UInt)-1;
 
 						try
-						{							
+						{
 							readEntity(&s, false, true, QP_NOT_PROCESS_QUOTES, false);
 							text -> readValueUndefinedType(v, !s);
 						}
 						ADD_TO_ERROR_DESCRIPTION("reading the sought value");
 
 						ADDTOLOG2("goto : %s", !s);
-						
+
 						readValue(&s, true);
 
 						if (s == ")") {
-							
+
 							if (!bracketWasTyped) {
 
 								throw new Exception("unexpected bracket");
@@ -688,29 +688,29 @@ void Script :: run(
 						else {
 
 							try
-							{								
+							{
 								stopPosition = (UInt)s.getNumber(true, false);
 							}
 							ADD_TO_ERROR_DESCRIPTION("reading the stop position for search, use enclosing brackets to omit this parameter");
 						}
 
 						ADDTOLOG2("goto : stop on %u", stopPosition);
-						
+
 						UInt posOfFoundEntry;
 						if (kw_id == KW_GOTO) {
 
-							posOfFoundEntry 
+							posOfFoundEntry
 								= buf -> getPacket().getContentOfPacket().search(*v.ref(), buf -> getPos(), stopPosition);
 						}
 						else {
 
-							posOfFoundEntry 
+							posOfFoundEntry
 								= buf -> getPacket().getContentOfPacket().searchBack(*v.ref(), buf -> getPos(), stopPosition);
 						}
 
 						if (posOfFoundEntry == DATA_NOT_FOUND) {
 
-							dataWasFound = false;							
+							dataWasFound = false;
 						}
 						else {
 
@@ -734,7 +734,7 @@ void Script :: run(
 
 					case KW_HELP: {
 
-						MString word;
+						MessageString word;
 
 						try
 						{
@@ -750,17 +750,17 @@ void Script :: run(
 
 					case KW_SETSIZE: {
 
-						MString word;
-						MString nameOfField;						
+						MessageString word;
+						MessageString nameOfField;
                   const FieldInfo* field;
 
 						try
-						{							
+						{
 							readNameEntity(&nameOfField, true);
                      field = fields.getFieldEx(nameOfField);
 						}
 						ADD_TO_ERROR_DESCRIPTION("reading the name of field");
-						
+
 						try
 						{
                      DefSize size = DefSize :: UNDEFINED;
@@ -773,20 +773,20 @@ void Script :: run(
                      }
 
                      fields.setSizeOfField(!nameOfField, size);
-                     
+
 						}
 						ADD_TO_ERROR_DESCRIPTION("reading and setting the size for field");
 
 
 						break;
-					}										
+					}
 
 					case KW_RANGE: {
 
-						MString word;
+						MessageString word;
 						UInt startPacket;
 						UInt stopPacket;
-						
+
 						BLOCK_WHILE_STAT_REGIME
 
 						try
@@ -815,16 +815,16 @@ void Script :: run(
 						convtest.addRepMaker(this, false);
 						break;
 
-					case KW_ARM: 
+					case KW_ARM:
 
 						BLOCK_WHILE_STAT_REGIME
 
 						processARepMakerCommand();
 						break;
-					
+
 					case KW_NUMRET: {
 
-						MString word;
+						MessageString word;
 						UInt n = 1;
 
 						BLOCK_WHILE_STAT_REGIME
@@ -841,7 +841,7 @@ void Script :: run(
 						break;
 					}
 
-					case KW_GETCH: 
+					case KW_GETCH:
 
 						if (reg != SR_STAT) getchar();
 						break;
@@ -850,14 +850,14 @@ void Script :: run(
 
 						if (reg == SR_GEN && !fastTestAlreadyProccessed) {
 
-							MString file;
+							MessageString file;
 
 							if (nameTopLevelFile.size() == 0) {
 
 								throw new Exception("command is not available in given context");
 							}
 
-							file = nameTopLevelFile;							
+							file = nameTopLevelFile;
 
 							try
 							{
@@ -871,7 +871,7 @@ void Script :: run(
 							reset(SR_GEN);
 
 							fastTestAlreadyProccessed = true;
-						}					
+						}
 
 						break;
 
@@ -896,7 +896,7 @@ void Script :: run(
 
 					case KW_CHTRACE: {
 
-						MString word;
+						MessageString word;
 
 						BLOCK_WHILE_STAT_REGIME
 
@@ -905,12 +905,12 @@ void Script :: run(
 						int keywordID = is_keyword(!word);
 						if (keywordID != KW_START_BLOCK)
 							throw new Exception("after command the start of the new block (%s) is expected", key_words[KW_START_BLOCK].keyword);
-						
+
 						// creating the new StresstestTextBuffer object
 
 						StresstestTextBuffer* copyOfText = new StresstestTextBuffer();
 						StresstestTextBuffer* lastText = text;
-						text = copyOfText;					
+						text = copyOfText;
 
 						Packet* prevPacket = new Packet();
 						*prevPacket = *(buf -> getPacketSpecial()); // stores the current packet
@@ -937,10 +937,10 @@ void Script :: run(
 							// checks if the current packet correspond the mask which is defined before command
 
 							if (!prevPacket -> isPacketCorrespondsTheMask(pacBuf, sizePac)) continue;
-														
+
 							buf -> setFullPacket(pacBuf, sizePac);	// copies to the buffer of packets sequence
 
-							// processing block's content 
+							// processing block's content
 
 							*text = *lastText;	// !!! restores the initial parameters of StresstestTextBuffer object
 							runBlock(false);
@@ -973,7 +973,7 @@ void Script :: run(
 
 					case KW_FILTER: {
 
-						MString word;
+						MessageString word;
 
 						UInt n;
 
@@ -989,18 +989,18 @@ void Script :: run(
 
 						if (!ethInt)
 							throw new Exception("command is not supported for current device");
-												
+
 						try
 						{
 							readStringOnly(&word);
 						}
-						ADD_TO_ERROR_DESCRIPTION("reading the string which describes the filter");						
+						ADD_TO_ERROR_DESCRIPTION("reading the string which describes the filter");
 
 						try
 						{
 							ethInt -> setFilter((char*)word.c_str());
 						}
-						ADD_TO_ERROR_DESCRIPTION2("setting the filter '%s'", word.c_str());						
+						ADD_TO_ERROR_DESCRIPTION2("setting the filter '%s'", word.c_str());
 
 						break;
 					}
@@ -1012,31 +1012,31 @@ void Script :: run(
 						StresstestTextBuffer* lastText = text;
 
 						BLOCK_WHILE_STAT_REGIME
-								  
+
 						ADDTOLOG2("block start process : line %i", text -> getLineNumber());
 
 						copyOfText = *text;
-												
+
 						text = &copyOfText;
 
 						bool cycleWasBefore_prev = cycleWasBefore;
 						cycleWasBefore = false;
-                  numIterations = 1;						
-						
+                  numIterations = 1;
+
 						try{
 							if (n > 0) for (UInt i = 0; i < n && !needBreak && !needBreakCycle; i++) {
-								*text = *lastText;						   
-								runBlock(false);								
+								*text = *lastText;
+								runBlock(false);
 							}
-							else runBlock(true);								
+							else runBlock(true);
 						}
 						catch (Exception* e) {
 							text = lastText;
 							throw;
-						}	
+						}
 
-                     
-						if (cycleWasBefore_prev) needBreakCycle = false;                                                                           
+
+						if (cycleWasBefore_prev) needBreakCycle = false;
 						text = lastText;
 						*text = copyOfText;
 						numBlocksDepth--;
@@ -1045,13 +1045,13 @@ void Script :: run(
 					}
 
 					case KW_END_BLOCK:
-												
+
 						break;
 
 					case KW_PRINTL:
 					case KW_PRINT: {
 
-						MString message;
+						MessageString message;
 
 						try
 						{
@@ -1060,7 +1060,7 @@ void Script :: run(
 								// resolving of references must be avoided while statistic regime
 								// so not use readString method
 
-								read_word(message, true, true);														
+								read_word(message, true, true);
 
 							else {
 
@@ -1071,8 +1071,8 @@ void Script :: run(
 						}
 						ADD_TO_ERROR_DESCRIPTION("reading the string which must be displayed");
 
-						if (reg != SR_STAT) {							
-							
+						if (reg != SR_STAT) {
+
 							if (kw_id == KW_PRINTL) {
 
 								//message.resize(300);
@@ -1082,8 +1082,8 @@ void Script :: run(
 							}
 							else {
 
-								printf("%s", !message);							
-							}                                          
+								printf("%s", !message);
+							}
                      fflush(stdout);
 						}
 
@@ -1092,16 +1092,16 @@ void Script :: run(
 
 					case KW_IF: {
 
-						MString val1;
-						MString val2;
-						MString typeCompareString;
+						MessageString val1;
+						MessageString val2;
+						MessageString typeCompareString;
 						TypeCompareField typeCompare;
 
 						// reads first compare operand
 
                   //TODO[at] not quoted string must not be accepted
 						try
-						{	
+						{
 							readStringRequireQuots(&val1);
 							ADDTOLOG2("KW_IF -- first item = %s", !val1);
 						}
@@ -1123,7 +1123,7 @@ void Script :: run(
 						// reads second compare operand
 
 						try
-						{							
+						{
 							readStringRequireQuots(&val2);
 							ADDTOLOG2("KW_IF -- second item = %s", !val2);
 						}
@@ -1133,7 +1133,7 @@ void Script :: run(
 
 						// reads the optional )
 
-						read_word(val1, true, false);												
+						read_word(val1, true, false);
 
 						if	(val1 == ")") {
 
@@ -1142,12 +1142,12 @@ void Script :: run(
 						}
 						else {
 
-							if (bracketWasTyped) 
+							if (bracketWasTyped)
 								throw new Exception("the match bracket is missing");
 						}
 
 						// reads KW_START_BLOCK after the command
-						
+
 						int kwID = is_keyword(!val1);
 						if (kwID != KW_START_BLOCK) {
 
@@ -1169,38 +1169,38 @@ void Script :: run(
 
 					case KW_IFR: {
 
-						MString word;
-						MString namePacket;
+						MessageString word;
+						MessageString namePacket;
 
 						BLOCK_WHILE_STAT_REGIME
-						
+
 						// reads the name of target packet
 
 						//readString(&namePacket);
-						
+
 						readEntity(&namePacket, false, true, QP_REMOVE_OPTIONAL_QUOTES, false);
 
 						// reads optional ) or KW_START_BLOCK
 
-						read_word(word, true, false);						
+						read_word(word, true, false);
 						if (bracketWasTyped && word == ")") read_word(word, true);
 						if (word != key_words[KW_START_BLOCK].keyword)
 							throw new Exception("given '%s', but expected the start of new black (%s)", !word, key_words[KW_START_BLOCK].keyword);
 
-						const MString nameLastReceivedPacket = ras -> getNameLastReceivedPacket();
+						const MessageString nameLastReceivedPacket = ras -> getNameLastReceivedPacket();
 
 						// processes the block
 
-						bool isProcessBlock 
-							= (nameLastReceivedPacket.empty() && namePacket == "timeout") 
+						bool isProcessBlock
+							= (nameLastReceivedPacket.empty() && namePacket == "timeout")
 								|| (nameLastReceivedPacket == namePacket);
 
 						ADDTOLOG4("IFR : last rec %s, given %s, res %i", !nameLastReceivedPacket, !namePacket, isProcessBlock);
-						
+
 						runBlock(!isProcessBlock);
 
 						processElse(isProcessBlock);
-						
+
 						bracketWasTyped = false;
 
 						break;
@@ -1222,7 +1222,7 @@ void Script :: run(
 						}
 						ADD_TO_ERROR_DESCRIPTION("reading the number of packet to delete (1-based)");
 
-						BLOCK_WHILE_STAT_REGIME						
+						BLOCK_WHILE_STAT_REGIME
 
 						convtest.file -> deletePacket(n, Null);
 						break;
@@ -1231,7 +1231,7 @@ void Script :: run(
 					case KW_INSPAC:
 					case KW_SETPAC: {
 
-						MString word;
+						MessageString word;
 						UInt numPac;
 
 						BLOCK_WHILE_STAT_REGIME
@@ -1250,14 +1250,14 @@ void Script :: run(
 						if (kw_id == KW_SETPAC)
 							convtest.file -> replacePacket(numPac, !(buf -> getPacket().getContentOfPacket()), sizePac);
 						else
-							convtest.file -> insertPacket(numPac, !(buf -> getPacket().getContentOfPacket()), sizePac);						
+							convtest.file -> insertPacket(numPac, !(buf -> getPacket().getContentOfPacket()), sizePac);
 
 						break;
 					}
 
 					case KW_GETPAC: {
 
-						MString word;						
+						MessageString word;
 						UInt numPac;
 
 						try
@@ -1267,18 +1267,18 @@ void Script :: run(
 						}
 						ADD_TO_ERROR_DESCRIPTION("reading the number of packet (1-based)");
 
-						UInt sizePac;						
+						UInt sizePac;
 
 						UChar* pacBuf = convtest.file -> getPacketByNumber(numPac, &sizePac, Null);
 						buf -> setFullPacket(pacBuf, sizePac);
-						
+
 						break;
 					}
 
 				   case KW_LOADVAR: {
 
-						MString nameOfFile;												
-						MString nameOfVariable;
+						MessageString nameOfFile;
+						MessageString nameOfVariable;
 						FieldVariableValue* var;
 						FileWorker file;
 
@@ -1295,20 +1295,20 @@ void Script :: run(
 
 						try
 						{
-							readString(&nameOfFile);	
+							readString(&nameOfFile);
 						}
 						ADD_TO_ERROR_DESCRIPTION("reading the name of file");
 
 						file.load(!nameOfFile);
 
-						*((DBuffer*)&(var -> getValue())) = file;						
+						*((DBuffer*)&(var -> getValue())) = file;
 						break;
 					}
 
 				   case KW_WRITEVAR: {
 
-						MString nameOfFile;												
-						MString nameOfVariable;
+						MessageString nameOfFile;
+						MessageString nameOfVariable;
 						FieldVariableValue* var;
 						FileWorker file;
 
@@ -1325,14 +1325,14 @@ void Script :: run(
 
 						try
 						{
-							readStringOnly(&nameOfFile);	
+							readStringOnly(&nameOfFile);
 						}
 						ADD_TO_ERROR_DESCRIPTION("reading the name of file");
 
 						(DBuffer&)file = var -> getValueConst();
 
-						file.save(!nameOfFile);						
-						
+						file.save(!nameOfFile);
+
 						break;
 					}
 
@@ -1345,7 +1345,7 @@ void Script :: run(
 
 					case KW_RUN: {
 
-						MString word;
+						MessageString word;
 
 						BLOCK_WHILE_STAT_REGIME
 
@@ -1362,7 +1362,7 @@ void Script :: run(
 						{
 							read_word(word, true);
 
-							int kwID = is_keyword(!word);							
+							int kwID = is_keyword(!word);
 
 							if (kwID == KW_SENDD || kwID == KW_BLOCK) {
 
@@ -1383,9 +1383,9 @@ void Script :: run(
 							}
 						}
 						ADD_TO_ERROR_DESCRIPTION("reading the request");
-						
-						MString requestString;
-						requestString = word;					
+
+						MessageString requestString;
+						requestString = word;
 
 						// reads the list of packets
 
@@ -1395,10 +1395,10 @@ void Script :: run(
 						{
 							read_word(word, true);
 							//printf("%s\n", !word);
-							requestPackets.setByString(!word, convtest.file -> getTotalNumberOfPackets());							
+							requestPackets.setByString(!word, convtest.file -> getTotalNumberOfPackets());
 						}
 						ADD_TO_ERROR_DESCRIPTION2("reading the list of packets (ex 1,2-5,6,5) : %s", !word);
-						 
+
 						if (nameOfCurrentPacket.size() == 0) {
 
 							nameOfCurrentPacket.resize(50 + text -> getShortNameSource().size());
@@ -1406,7 +1406,7 @@ void Script :: run(
 						}
 
 						// runs imitation
-						
+
 						if (!ras -> quietMode) printf("Started %s\n", !nameOfCurrentPacket);
 
 						ras -> isResendPackets = true;
@@ -1421,12 +1421,12 @@ void Script :: run(
 						nameOfCurrentPacket = ""; /* doesn't mark the description of new packet but resets 'nameOfCurrentPacket'
 															  in order to next packet or test doesnt inherit this name
 															*/
-						
+
 						break;
 					}
 
 					case KW_EP: {
-						
+
 						BLOCK_WHILE_STAT_REGIME
 
 						if (!convtest.file -> isOpened()) {
@@ -1439,19 +1439,19 @@ void Script :: run(
 					}
 
 					case KW_OPENTRACE: {
-						
-						MString name;
+
+						MessageString name;
 
 						readString(&name);
 
-						MString path;
+						MessageString path;
                   includePaths.search(path, !name);
 						if (path.size() == 0) path = name;
 						convtest.file -> load(!path);
 						break;
 					}
 
-					case KW_CAREFULWAIT: 
+					case KW_CAREFULWAIT:
 
 						BLOCK_WHILE_STAT_REGIME
 
@@ -1467,12 +1467,12 @@ void Script :: run(
 
 					case KW_SYSCALL: {
 
-						MString word;
+						MessageString word;
 
-						BLOCK_WHILE_STAT_REGIME						
+						BLOCK_WHILE_STAT_REGIME
 
 						try
-						{							
+						{
 							readStringOnly(&word);
 						}
 						ADD_TO_ERROR_DESCRIPTION2("inserting substitutions in string %s", !word);
@@ -1484,25 +1484,25 @@ void Script :: run(
 
 					case KW_CYC: {
 
-						MString val;
+						MessageString val;
 
 						BLOCK_WHILE_STAT_REGIME
 
 						try
-						{								
+						{
 							readValue(&val, true);
 
 							UInt n;
 
-							if (val == "inf") 
+							if (val == "inf")
 
 								n = 0xffffffff;
 
 							else {
 
-								n = (UInt)val.getNumber(true, true);								
+								n = (UInt)val.getNumber(true, true);
 							}
-							
+
 							numIterations = n;
 							cycleWasBefore = true;
 						}
@@ -1520,7 +1520,7 @@ void Script :: run(
 
 					case KW_TIMEOUT: {
 
-						MString value;
+						MessageString value;
 						int n;
 
 						BLOCK_WHILE_STAT_REGIME
@@ -1528,7 +1528,7 @@ void Script :: run(
 						try
 						{
 							readValue(&value);
-							n = (UInt)value.getNumber(true, false);						
+							n = (UInt)value.getNumber(true, false);
 						}
 						ADD_TO_ERROR_DESCRIPTION("reading the value of timeout (in milliseconds)");
 
@@ -1537,14 +1537,14 @@ void Script :: run(
 							timeoutForWaitCommand = (UInt) abs(n);
 							convtest.setTimeout(timeoutForWaitCommand);
 						}
-						else 
+						else
 							timeoutForWaitCommand = INFINITE_WAITING;
 
 						TCPDevice :: timeoutInMilliseconds = timeoutForWaitCommand;
 
-						if (n >= 0) 
+						if (n >= 0)
 							ras -> waitAllPackets = false;
-						else 
+						else
 							ras -> waitAllPackets = true;
 
 						break;
@@ -1556,7 +1556,7 @@ void Script :: run(
 					case KW_INCVAR: {
 
 						decimal_number_type numToAdd;
-						MString value;						
+						MessageString value;
 						FieldVariableValue* var = 0;
 						bool neg = false;
 						bool mul = false;
@@ -1567,7 +1567,7 @@ void Script :: run(
 						// reads the name of variable
 
 						try
-						{								
+						{
 							readNameEntity(&value, true);
 							var = variables.getVariable(!value, false);
 							if (!var) {
@@ -1576,11 +1576,11 @@ void Script :: run(
 							}
 						}
 						ADD_TO_ERROR_DESCRIPTION("reading the name of variable");
-							
+
 						// reads the value by which subtract, divide, ...
 
 						try
-						{								
+						{
 							readValue(&value);
 						}
 						ADD_TO_ERROR_DESCRIPTION("reading the value to add");
@@ -1592,7 +1592,7 @@ void Script :: run(
 							numToAdd = (decimal_number_type)value.getNumber(true);
 						}
 						ADD_TO_ERROR_DESCRIPTION2("converting '%s' to number", !value);
-						
+
 						if (!mul) {
 
 							// addition or subtraction
@@ -1604,11 +1604,11 @@ void Script :: run(
 
 							// multiply or divide
 
-							MString value = var -> getValue().getValueString();
-							decimal_number_type n;														
+							MessageString value = var -> getValue().getValueString();
+							decimal_number_type n;
 							try
 							{
-								n = (decimal_number_type)value.getNumber(true);								
+								n = (decimal_number_type)value.getNumber(true);
 							}
 							ADD_TO_ERROR_DESCRIPTION2("converting value '%s' to number", !value);
 
@@ -1626,11 +1626,11 @@ void Script :: run(
 						}
 
 						break;
-					}					
+					}
 
 					case KW_INTERVAL: {
 
-						MString value;
+						MessageString value;
 
 						try
 						{
@@ -1646,20 +1646,20 @@ void Script :: run(
 						dev -> setSafeTerm(true);
 						break;
 
-					case KW_BEEP: {						
+					case KW_BEEP: {
 
 						#ifdef WIN32
 						Beep(700, 100);
 						#else
 						beep();
 						#endif
-						
+
 						break;
 					}
 
 					case KW_MAIN_INTERFACE: {
 
-						MString s;
+						MessageString s;
 						UInt num;
 						UInt userNumber;
 
@@ -1672,11 +1672,11 @@ void Script :: run(
 						try
 						{
 							readString(&s);
-							num = ras -> getInterfaceNumByName(s, true);						
+							num = ras -> getInterfaceNumByName(s, true);
 						}
-						ADD_TO_ERROR_DESCRIPTION("reading the unique name of interface");						
-						
-						setMainInterfaceNum(num);						
+						ADD_TO_ERROR_DESCRIPTION("reading the unique name of interface");
+
+						setMainInterfaceNum(num);
 
 						break;
 					}
@@ -1697,7 +1697,7 @@ void Script :: run(
 
 					case KW_NAME_OF_PACKET: {
 
-						MString name;
+						MessageString name;
 
 						try
 						{
@@ -1744,7 +1744,7 @@ void Script :: run(
 						try
 						{
 							readValue(&word);
-							pos = (int)word.getNumber(true, true);							
+							pos = (int)word.getNumber(true, true);
 						}
 						ADD_TO_ERROR_DESCRIPTION("reading the number of bytes which the current position of pointer will be reduced for");
 
@@ -1789,7 +1789,7 @@ void Script :: run(
 					}
 
 					case KW_MASK: {
-						
+
 						try
 						{
 							read_word(word, true);
@@ -1804,7 +1804,7 @@ void Script :: run(
 					// VALUE <value's name> <value> , Ex: VALUE http 80s2.
 					case KW_GDEFINE:
 					case KW_DEFINE: {
-												
+
 						processDefineCommand(kw_id == KW_GDEFINE);
 						break;
 					}
@@ -1816,7 +1816,7 @@ void Script :: run(
 						try
 						{
 							readValue(&word);
-							num = (UInt)word.getNumber(true, true);							
+							num = (UInt)word.getNumber(true, true);
 						}
 						ADD_TO_ERROR_DESCRIPTION("reading the number of bytes which the current position of pointer will be increased for");
 
@@ -1827,34 +1827,34 @@ void Script :: run(
 						buf -> clearMask();
 						ras -> pauseTraceAfterFirstPacket = true;
 						ras -> setRefToPacket(&buf);
-						
-					case KW_SENDWAITOTHER:  
+
+					case KW_SENDWAITOTHER:
 					case KW_SENDWAIT:
 					case KW_WAITALL:
 					case KW_OR:
 					case KW_ADD:
 					case KW_TOWAIT:			// ATTENTION: any new command must be also added to method 'readRequests'
 					case KW_WAIT: {
-						
-						BLOCK_WHILE_STAT_REGIME					
+
+						BLOCK_WHILE_STAT_REGIME
 
 						if (kw_id == KW_OR || kw_id == KW_ADD) {
 							kw_id = KW_TOWAIT;
 						}
-						
+
 						if (kw_id == KW_RECV) {
 							kw_id = KW_WAIT;
 						}
-								  
+
 						if (reg == SR_SNIFFER) {
 
 							throw new Exception("command is not allowed while working in this regime");
 						}
 
-						if (reg == SR_GEN) {													
-							
+						if (reg == SR_GEN) {
+
 							if (kw_id != KW_WAITALL && kw_id != KW_SENDWAITOTHER) {
-							
+
 								prepare_packet();
 								readRequests(kw_id);
 							}
@@ -1883,10 +1883,10 @@ void Script :: run(
 										printf("Waiting packets...");
 									}
 								}
-								
-								fflush(stdout);								
 
-								if (kw_id != KW_WAITALL && kw_id != KW_SENDWAITOTHER) { // it's logical that KW_WAITALL doesn't start a new packet                     
+								fflush(stdout);
+
+								if (kw_id != KW_WAITALL && kw_id != KW_SENDWAITOTHER) { // it's logical that KW_WAITALL doesn't start a new packet
 
 								  newpac();
 								}
@@ -1899,7 +1899,7 @@ void Script :: run(
 								for (UInt i = 0; i < n && !needBreak; i++) {
 
 									ras -> waitAnyFirstPacket(getMainInterfaceNum(), timeoutForWaitCommand, i != n - 1, true);
-								}								
+								}
 							}
 							else {
 
@@ -1911,8 +1911,8 @@ void Script :: run(
 					}
 
                case KW_OPEN: {
-                  MString type;
-                  MString name;                  
+                  MessageString type;
+                  MessageString name;
                   readString(&type);
                   readString(&name);
 						try
@@ -1925,19 +1925,19 @@ void Script :: run(
 						}
 						catch (SocketInterface :: ConnectionFailedException* e) {
 							ras -> setNameLastReceivedPacket("error");
-							if (!ras -> quietMode) printf("%s\n", e -> get_message());							
-							delete e;							
+							if (!ras -> quietMode) printf("%s\n", e -> get_message());
+							delete e;
 						}
 						catch (SocketInterface :: ConnectionTimeoutException* e) {
 							ras -> setNameLastReceivedPacket("timeout");
 							if (!ras -> quietMode) printf("%s\n", e -> get_message());
-							delete e;							
-						}                  
+							delete e;
+						}
                   break;
                }
 
                case KW_CLOSE: {
-                  MString name;
+                  MessageString name;
                   readString(&name);
                   uint n = dev -> closeInterface(name);
 						// TODO: numbers of interfaces in requests are not shifted after this
@@ -1948,7 +1948,7 @@ void Script :: run(
 							if (mainInterfaceNum > (int)n) {
 								mainInterfaceNum--;
 							}
-						}								  
+						}
                   break;
                }
 
@@ -1956,21 +1956,21 @@ void Script :: run(
 
 						UInt com_line_num = text -> getLineNumber();
 
-                  // NOTE: if reg == SR_STAT then devices must be also open, otherwise there will be problems with unique names						                  					
-                  
-                  if (fastTestAlreadyProccessed && reg == SR_GEN) 
+                  // NOTE: if reg == SR_STAT then devices must be also open, otherwise there will be problems with unique names
+
+                  if (fastTestAlreadyProccessed && reg == SR_GEN)
 
                      // this command will be ignored in generation regime after gathering packets info in stat regime
 
-                     break;                  
-						
+                     break;
+
 						ras -> stopTrace();
 						dev -> release();
 
                   //globalDevice = Null;
 
                   // reads the type of device
-                  MString devName;
+                  MessageString devName;
 
                   try
                   {
@@ -2005,10 +2005,10 @@ void Script :: run(
 
 						do {
 
-							if (!word.size()) break;							
+							if (!word.size()) break;
 
 							   // opens interface
-						
+
                      dev -> openInterface(devName, word);
 
 							text -> storeCurrentPosition();
@@ -2016,18 +2016,18 @@ void Script :: run(
 						}
 						while (text -> getLineNumber() == com_line_num);    // until next line
 
-						if (text -> getLineNumber() != com_line_num) 
-							text -> restoreKeptPosition();						
+						if (text -> getLineNumber() != com_line_num)
+							text -> restoreKeptPosition();
 
                   set_device(dev, 0);  // buf must be recteated corresponding to new type of device
                   convtest.device = dev;
-                  ras -> set_device(dev);                  
+                  ras -> set_device(dev);
 
 						//buf -> newset();
-                  
+
 						ras -> startConcurrentSniffersOnInterfaces();
 
-						mysleep(PAUSE_BEFOR_GENERATING);																		
+						mysleep(PAUSE_BEFOR_GENERATING);
 
 						break;
 					}
@@ -2035,7 +2035,7 @@ void Script :: run(
 					case KW_REP: {
 
 						int num;
-						
+
 						try
 						{
 							readValue(&word);
@@ -2045,23 +2045,23 @@ void Script :: run(
 
 						numberOfGenerations = num;
 						break;
-					}					
+					}
 
 					case KW_INCLUDE: {
-						
-						MString nameIncludedFile;
+
+						MessageString nameIncludedFile;
 
 						try
 						{
 							//readString(&nameIncludedFile, true);	// dont use, some problems occur
 							read_word(nameIncludedFile, true, false);
 
-							
+
 							putValuesInMessage(&nameIncludedFile);
 						}
-						ADD_TO_ERROR_DESCRIPTION("reading the name of file to include");						
-						
-						processIncludeCommand(nameIncludedFile);						
+						ADD_TO_ERROR_DESCRIPTION("reading the name of file to include");
+
+						processIncludeCommand(nameIncludedFile);
 
 						break;
 					}
@@ -2069,11 +2069,11 @@ void Script :: run(
 					case KW_SEND:   // simply sends
 
 					case KW_SENDA:  // first request for packet is specified by command itself
-					case KW_SENDD:  
-					case KW_BLOCK:  
-					case KW_ACCEPT: 
-					case KW_ANY:					
-						
+					case KW_SENDD:
+					case KW_BLOCK:
+					case KW_ACCEPT:
+					case KW_ANY:
+
 						sendCommand(kw_id);
 						newpac();
 						break;
@@ -2085,10 +2085,10 @@ void Script :: run(
 						break;
 
 					case KW_INC:
-												
+
 						enableAutoincrement();
 						break;
-								
+
 					case KW_CLEAR_MASK:
 
 						ADDTOLOG1("Script :: run -- KW_RESET_MAS");
@@ -2097,7 +2097,7 @@ void Script :: run(
 						break;
 
 					case KW_CLEAR_HISTORY:
-						
+
 						buf -> clear_history();
 						break;
 
@@ -2110,7 +2110,7 @@ void Script :: run(
 							read_word(word, true);
 							pause = (UInt)word.getNumber(true, true);
 						}
-						ADD_TO_ERROR_DESCRIPTION("reading the duration of pause (in milliseconds)");	      			
+						ADD_TO_ERROR_DESCRIPTION("reading the duration of pause (in milliseconds)");
 
 						if (reg == SR_GEN)
 							mysleep(pause);
@@ -2128,8 +2128,8 @@ void Script :: run(
 				text -> storeCurrentPosition();
 				read_word(w1);
 				if (w1 != ")") {
-				
-					if (bracketWasTyped) 
+
+					if (bracketWasTyped)
 						throw new Exception("the match ) is missing");
 					text -> restoreKeptPosition();
 				}
@@ -2145,7 +2145,7 @@ void Script :: run(
 				if (kw_id != -1) e -> add("command %s (parameters %s)", key_words[kw_id].keyword, key_words[kw_id].parameterssdf);
 				throw;
 			}
-			
+
 			if (cycleWasBefore && kw_id != KW_CYC) {
 				throw new Exception("unexpected token '%s' after %s command, it can be followed only by restricted set of commands", !word, key_words[KW_CYC].keyword);
 			}
@@ -2158,8 +2158,8 @@ void Script :: run(
          if (valueType) {
             try
             {
-               MString name;
-               MString word;
+               MessageString name;
+               MessageString word;
                readNameEntity(&name, true, SE_VARIABLE);
                text -> nextWord(word, true);
                if (word != "=") {
@@ -2180,7 +2180,7 @@ void Script :: run(
             ADD_TO_ERROR_DESCRIPTION("creating variable");
             continue;
          }
-			      
+
          if (comProcessor) {
             try
             {
@@ -2210,7 +2210,7 @@ void Script :: run(
 
 			if (foundVariable) {
 
-				MString word;
+				MessageString word;
 				bool addition = false;
 				bool subtraction = false;
 
@@ -2221,7 +2221,7 @@ void Script :: run(
 					{
 						readValue(&word);
 						if (word == "=") {
-							
+
 							readValue(&word);
 						}
 						else {
@@ -2230,7 +2230,7 @@ void Script :: run(
 
 							if (word == "+=") {
 
-								addition = true;								
+								addition = true;
 							}
 							else {
 
@@ -2241,9 +2241,9 @@ void Script :: run(
 									subtraction = true;
 								}
 							}
-						}						
+						}
 					}
-					ADD_TO_ERROR_DESCRIPTION("reading the new value for variable");					
+					ADD_TO_ERROR_DESCRIPTION("reading the new value for variable");
 
 					if (!addition && !subtraction) {
 
@@ -2270,13 +2270,13 @@ void Script :: run(
 				}
 				ADD_TO_ERROR_DESCRIPTION("variable assignment");
 			}
-					
-         
+
+
 			if (word[0] == '.') {
 
 				// processes new field's definition
 
-				MString nameOfNewField = word;
+				MessageString nameOfNewField = word;
 
 				nameOfNewField.erase(0, 1);
 
@@ -2289,32 +2289,32 @@ void Script :: run(
 				ADD_TO_ERROR_DESCRIPTION("defining a new field (as the word begins from .)");
 
 				continue;
-			} 
-			
+			}
+
 			// processes name of included file
 
-			MString full_path;			
+			MessageString full_path;
 
 			includePaths.search(full_path, !word);
 			if (full_path.size() != 0) {
 
 				// processes included file
-				
+
 				processFile(!full_path);
-				
+
 			}
 			else {
 
 				// unknown word
 
 				throw new Exception("'%s' - unknown word : expected command, name of field, variable, file or value's type", !word);
-			}					
+			}
 
 		}  // main cycle
 
 		if (textToProcess) text = lastText;
 	}
-	
+
 	ADD_TO_ERROR_DESCRIPTION3("file '%s', line %i", !text -> getNameSource(), text -> getLineNumber());
 }
 
@@ -2323,7 +2323,7 @@ void Script :: processElse(bool isProcess) {
 	// processes ELSE block
 
 	text -> storeCurrentPosition();
-	MString val1;
+	MessageString val1;
 	read_word(val1, false, false);
 	if (val1 == "else") {
 
@@ -2343,9 +2343,9 @@ void Script :: processElse(bool isProcess) {
 
 
 void Script :: processFile(const char* filename) throw(Exception*) {
- 
+
 	StresstestTextBuffer* lastText = text;
-									  
+
 	if (needBreak) return;
 
 	StresstestTextBuffer newText;
@@ -2353,24 +2353,24 @@ void Script :: processFile(const char* filename) throw(Exception*) {
 
 	// determines the name of folder for file (from the path to file) and adds to 'paths'
 
-	MString fullPath;
+	MessageString fullPath;
 	includePaths.search(fullPath, filename);
 	if (fullPath.size() == 0) fullPath = filename;
 
 	size_t res = fullPath.rfind("/");
-	if (res == string :: npos) 
+	if (res == string :: npos)
 		res = fullPath.rfind("\\");
 
 	if (res != string :: npos) {
 
-		MString folderPath;
+		MessageString folderPath;
 		folderPath.assign(!fullPath, res);
 		includePaths.add_path(&folderPath);
 	}
 
 	// reads file
-		
-	text -> readFile(!fullPath);	
+
+	text -> readFile(!fullPath);
 
 	// processes file's content
 
@@ -2382,23 +2382,23 @@ void Script :: processFile(const char* filename) throw(Exception*) {
 		delete e;
 	}
 	catch (Exception* e) {
-		text = lastText;		
+		text = lastText;
 		throw e;
 	}
 	text = lastText;
 }
 
-MString& Script :: read_word(MString& word, bool failOnEmptyWord, bool removeEnclosingCommas) throw(Exception*) {
+MessageString& Script :: read_word(MessageString& word, bool failOnEmptyWord, bool removeEnclosingCommas) throw(Exception*) {
 
 	text -> nextWord(word, failOnEmptyWord);
-   
+
 	const char* foundValue = globalDefines.search_value(!word);
 	if (foundValue) {
       word = foundValue;
       putValuesInMessage(&word);
    }
 
-	if (removeEnclosingCommas) 
+	if (removeEnclosingCommas)
 		StresstestTextBuffer :: removeEnclosingCommas(&word);
 
 	return word;
@@ -2407,8 +2407,8 @@ MString& Script :: read_word(MString& word, bool failOnEmptyWord, bool removeEnc
 
 void Script :: processFieldDefinition(const char* fieldName) {
 
-	int offset;		
-	MString valueString;	
+	int offset;
+	MessageString valueString;
 	//const char* foundValue;
 	const FieldMask* mask;
 
@@ -2417,12 +2417,12 @@ void Script :: processFieldDefinition(const char* fieldName) {
 	check(fieldName[0]);
 
 	mask = fields.getmask();
-	offset = fields.get_def_offset();	
+	offset = fields.get_def_offset();
 
 	// reads word
 
 	read_word(valueString, true, false);
-		
+
 	putValuesInMessage(&valueString);
 
 	searchEntity(&valueString, QP_NOT_PROCESS_QUOTES, true);
@@ -2437,7 +2437,7 @@ void Script :: processFieldDefinition(const char* fieldName) {
 	text -> clearLastComments();
 
 	// fills packet's buffer
-	
+
 	CommonField f(fields, fieldName + 1);
 	f.setValue(*valueToWrite.ref());
 	buf -> setFieldValue(f, true);
@@ -2448,7 +2448,7 @@ void Script :: processFieldDefinition(const char* fieldName) {
 
 void Script :: addPacketToRas(int num, Request req, int interfaceNum, int line_number) {
 
-	MString nameOfPacket = nameOfCurrentPacket;
+	MessageString nameOfPacket = nameOfCurrentPacket;
 	bool isNameGiven = true;
 	if (nameOfCurrentPacket.size() == 0) {
 
@@ -2456,7 +2456,7 @@ void Script :: addPacketToRas(int num, Request req, int interfaceNum, int line_n
 		nameOfPacket.resize(50 + text -> getShortNameSource().size());
 		nameOfPacket.resize(sprintf((char*)nameOfPacket.c_str(), "Packet on line %i (%s)", line_number, !text -> getShortNameSource()));
 	}
-	
+
 	boolean b = (outputMessageForCurrentPacket.size() == 0 || outputMessageForCurrentPacket == "\'\'");
 
 	ras -> addPacket(num, getMainInterfaceNum(), req, interfaceNum,
@@ -2466,33 +2466,33 @@ void Script :: addPacketToRas(int num, Request req, int interfaceNum, int line_n
 
 void Script :: processVarCommand(bool* bracketWasTyped) {
 
-	MString fieldName;
-	MString varName;
-	MString varValue;
-	MString varType;
+	MessageString fieldName;
+	MessageString varName;
+	MessageString varValue;
+	MessageString varType;
 
 	CommonField* commonField;
 
 	ADDTOLOG1("Script :: processVarCommand -- start");
 
 	try
-	{			
+	{
 		readNameEntity(&varName, true, SE_VARIABLE);
 	}
-	ADD_TO_ERROR_DESCRIPTION("reading the name of variable");	
+	ADD_TO_ERROR_DESCRIPTION("reading the name of variable");
 
 	try
-	{			
+	{
 		readNameEntity(&fieldName);
-			
+
 		ADDTOLOG3("Script :: processVarCommand -- fieldName = %s, varName = %s", !fieldName, !varName);
 
-		commonField = new CommonField(fields, !fieldName);	
+		commonField = new CommonField(fields, !fieldName);
 	}
-	ADD_TO_ERROR_DESCRIPTION("reading the name of field");	
+	ADD_TO_ERROR_DESCRIPTION("reading the name of field");
 
 	try
-	{			
+	{
 		readValue(&varValue, true);
 		commonField -> readValue(!varValue);
 	}
@@ -2516,7 +2516,7 @@ void Script :: processVarCommand(bool* bracketWasTyped) {
 			if (varType == "autoset") autoSet = true;
 			else {
 
-				if (varType != "static") 
+				if (varType != "static")
 					throw new Exception("given '%s', but expected the type of variable (static or autoset)", !varType);
 			}
 		}
@@ -2532,16 +2532,16 @@ void Script :: processVarCommand(bool* bracketWasTyped) {
 }
 
 
-void Script :: processIncludeCommand(MString& nameIncludedFile) {
-		
-	MString fullNameIncludedFile;
+void Script :: processIncludeCommand(MessageString& nameIncludedFile) {
+
+	MessageString fullNameIncludedFile;
 
 	StresstestTextBuffer :: removeEnclosingCommas(&nameIncludedFile);
 
 	// reads file's name
 
 	fullNameIncludedFile = nameIncludedFile;
-	
+
 	// resolves file's name (searches it)
 
 	includePaths.search(fullNameIncludedFile, !nameIncludedFile);
@@ -2560,23 +2560,23 @@ void Script :: performAutoincrement() {
 
 	if (!autoIncrementedField) return;
 
-	autoIncrementedField -> changeValue(1);	
+	autoIncrementedField -> changeValue(1);
 	buf -> setFieldValue(*autoIncrementedField, false);
 }
 
 
 void Script :: processDefineCommand(bool global) {
 
-	MString name; 
-	MString val;  	
+	MessageString name;
+	MessageString val;
 
 	// reads the first name - the name while will be substituted
 
 	try
-	{			
+	{
 		text -> nextWord(name, true);		  // only this function, don't use Script :: read_word or any higher level function
 														  // otherwise already existing substitutions will be performed while reading this name
-		if (is_keyword(!name) != NOT_KEY_WORD) 
+		if (is_keyword(!name) != NOT_KEY_WORD)
 			throw new Exception("key word is not allowed");
 	}
 	ADD_TO_ERROR_DESCRIPTION("reading the first name which will be replaced");
@@ -2584,7 +2584,7 @@ void Script :: processDefineCommand(bool global) {
 	// reads the second name - the name which will be inserted
 
 	try
-	{		
+	{
 		readEntity(&val, false, true, QP_NOT_PROCESS_QUOTES, true, false, false, SE_NOT_DEFINED);
 	}
 	ADD_TO_ERROR_DESCRIPTION("reading the second name by which the first will be replaced");
@@ -2618,30 +2618,30 @@ void Script :: sendCommand(int keywordID) {
 		&& !fastTestAlreadyProccessed && reg != SR_STAT)
 
 		throw new Exception("processing '%s' : request specification may only follow some command or fast test must be enabled (command %s)", key_words[keywordID].keyword, key_words[KW_FASTTEST].keyword);
-	    
+
 	prepare_packet();	// don't remove it (for SR_STAT or SR_SNIFFER regimes)
-			
+
 	if (reg == SR_GEN) {
 
-		int i;		
+		int i;
 
 		// generations cycle
 
 		for (i = 0; i < numberOfGenerations && !needBreak; i++) {
-         
+
 			if (i && autoIncrementedField) {
-			
+
 				// if value for some field is incremented then we must prepare_packet every time (except the first)
 
 				prepare_packet();
 			}
-												  				
+
 			if (!dev -> numOpenedInterfaces() && dev -> getInterface(getMainInterfaceNum()) -> getDevice()  -> gettype() != IPDevice :: name) {
 
 				 // no opened interfaces
              throw new Exception("sending packet : no interface opened (use option -d or %s command)", key_words[KW_DEVICES].keyword);
-         }			
-			
+         }
+
 			buf -> send(this);  // one generation
 
 			if (numberOfGenerations > 1 && interval != 0)
@@ -2656,26 +2656,26 @@ void Script :: sendCommand(int keywordID) {
 
 			if (nameOfCurrentPacket.size() == 0) {
 
-				printf("Was generated packet on line %i (%i times), user size = %i\n", text -> getLineNumber(), i, 
+				printf("Was generated packet on line %i (%i times), user size = %i\n", text -> getLineNumber(), i,
 					buf -> getCurrentSize() - buf -> getinitpos());
 			}
 			else
 
-				printf("Was generated %s (%i times), user size = %i\n", !nameOfCurrentPacket, i, 
+				printf("Was generated %s (%i times), user size = %i\n", !nameOfCurrentPacket, i,
 					buf -> getCurrentSize() - buf -> getinitpos());
 		}
 	}
 
 	// reads requests after the command
-	
-	readRequests(keywordID);		
+
+	readRequests(keywordID);
 }
 
 
 
 void Script :: readRequests(int firstKeyWordID) {
 
-	MString word;
+	MessageString word;
 	int nextRequest;
 	bool isWaitCommand = false;
 
@@ -2694,7 +2694,7 @@ void Script :: readRequests(int firstKeyWordID) {
 			ras -> defaultRequests[i] = RAS_NOINIT;
 		}
 	}
-		
+
 	// reads request's specifications until the first word which is not request specification
 
 	int i;
@@ -2703,52 +2703,52 @@ void Script :: readRequests(int firstKeyWordID) {
 		text -> storeCurrentPosition();
 
 		if (
-				i == 0 
-				&& 
-				(firstKeyWordID == KW_ACCEPT || firstKeyWordID == KW_BLOCK || firstKeyWordID == KW_SENDA 
+				i == 0
+				&&
+				(firstKeyWordID == KW_ACCEPT || firstKeyWordID == KW_BLOCK || firstKeyWordID == KW_SENDA
 					|| firstKeyWordID == KW_SENDD || firstKeyWordID == KW_ANY)
 			) {
 
 			// the firstKeyWordID defines the first request itself
-			
+
 			nextRequest = firstKeyWordID;
 
 		} else {
-			
+
 			// reads request specification
 
 			read_word(word);
 			nextRequest = is_keyword(!word);
-		}			
+		}
 
 		// translates similar codes to only two codes
 
 		if (nextRequest == KW_ACCEPT) nextRequest = KW_SENDA;
 		if (nextRequest == KW_BLOCK) nextRequest = KW_SENDD;
 
-		
-		if (nextRequest != KW_SENDA && nextRequest != KW_SENDD && nextRequest != KW_ANY 
+
+		if (nextRequest != KW_SENDA && nextRequest != KW_SENDD && nextRequest != KW_ANY
 			&& (nextRequest != KW_REVERS || firstKeyWordID != KW_DEFAULTS)
 			) {
 
 			// the word is not request's specification
 
-			text -> restoreKeptPosition();							
-			
+			text -> restoreKeptPosition();
+
 			if (i == 0) {
-								
+
 				// there are no requests, but the packet must be added (default requests will be set)
 
 				if (firstKeyWordID != KW_DEFAULTS) {
 
 					if (((reg == SR_STAT || reg == SR_SNIFFER)) || isWaitCommand)
-						addPacketToRas(SER_NEW_PACKET, ras -> defaultRequests[0], 0, bline_number);					
-				}				
-			}			
+						addPacketToRas(SER_NEW_PACKET, ras -> defaultRequests[0], 0, bline_number);
+				}
+			}
 
-			break;			
-		}			
-																	  
+			break;
+		}
+
 		// while stas regime requests will be shifted relative to interfaces
 		// the request for first interface will stay uninitialized
 
@@ -2758,46 +2758,46 @@ void Script :: readRequests(int firstKeyWordID) {
 
 			// extended regime has specified
 			// reads the unique name of interface
-			
+
 			try
 			{
-				MString s;
-            read_word(s, true);									
-				interfaceNum = ras -> getInterfaceNumByName(s, true);				
+				MessageString s;
+            read_word(s, true);
+				interfaceNum = ras -> getInterfaceNumByName(s, true);
 			}
 
 			ADD_TO_ERROR_DESCRIPTION("reading the unique name of interface after request");
 		}
 
-		if (firstKeyWordID != KW_DEFAULTS)			
+		if (firstKeyWordID != KW_DEFAULTS)
 
 			if (ras -> defaultRequests[interfaceNum] == RAS_REVERS) {
 
 				// revers request has specified
 
 				if (nextRequest == KW_SENDA) nextRequest = KW_SENDD;
-				else if (nextRequest == KW_SENDD)  nextRequest = KW_SENDA;				
+				else if (nextRequest == KW_SENDD)  nextRequest = KW_SENDA;
 			}
 
 		Request request = RAS_NOINIT;
 
 		// translates key word's code to request's codes
-		
+
 		switch (nextRequest) {
 
 			case KW_SENDA:
 
-				request = RAS_ACCEPT;						
+				request = RAS_ACCEPT;
 				break;
 
 			case KW_SENDD:
 
-				request = RAS_DROP;						
+				request = RAS_DROP;
 				break;
 
 			case KW_ANY:
 
-				request = RAS_ANY;						
+				request = RAS_ANY;
 				break;
 
 			case KW_REVERS:
@@ -2806,10 +2806,10 @@ void Script :: readRequests(int firstKeyWordID) {
 				break;
 
 			default: Test();
-		}				
+		}
 
 		if (firstKeyWordID != KW_DEFAULTS) {
-			
+
 			// adds the packet
 			// while SR_GEN regime if it's not wait command then the packet will not be added
 
@@ -2819,7 +2819,7 @@ void Script :: readRequests(int firstKeyWordID) {
 		else {
 
 			// sets default request for interface
-						
+
 			ras -> defaultRequests[interfaceNum] = request;
 		}
 	}
@@ -2831,22 +2831,22 @@ void Script :: readRequests(int firstKeyWordID) {
 }
 
 
-void Script :: makeSystemCall(const MString& command) {
+void Script :: makeSystemCall(const MessageString& command) {
 
 	#ifdef WIN32
 	STARTUPINFO stinfo;
 	PROCESS_INFORMATION prinfo;
 	memset(&stinfo, 0, sizeof(stinfo));
 	stinfo.cb = sizeof(stinfo);
-	memset(&prinfo, 0, sizeof(prinfo));					
-	
+	memset(&prinfo, 0, sizeof(prinfo));
+
 	if (!CreateProcess(
 		NULL,
 		(LPSTR)!command,
 		NULL,
-		NULL, 
-		false, 
-		NORMAL_PRIORITY_CLASS | CREATE_DEFAULT_ERROR_MODE | CREATE_NEW_PROCESS_GROUP, 
+		NULL,
+		false,
+		NORMAL_PRIORITY_CLASS | CREATE_DEFAULT_ERROR_MODE | CREATE_NEW_PROCESS_GROUP,
 		NULL,
 		NULL,
 		&stinfo,
@@ -2856,17 +2856,17 @@ void Script :: makeSystemCall(const MString& command) {
 			printf("Warning: running application %s : %s\n", !command, winerror());
 	}
 	resultLastSystemCall = 0;
-	#else	
+	#else
 	if (-1 == (resultLastSystemCall = system(!command))) {
 
 		printf("\nwarning: error while system call (%s)\n", !command);
 	}
 	resultLastSystemCall >>= 8;	// 'system' returns value shifted by 8 bits to the left
-	#endif							
+	#endif
 }
 
 
-TypeCompareField Script :: isCompareQualifier(const MString& word) {
+TypeCompareField Script :: isCompareQualifier(const MessageString& word) {
 
 	check(TCF_NUM_TYPES == 6);
 
@@ -2878,14 +2878,14 @@ TypeCompareField Script :: isCompareQualifier(const MString& word) {
 	if (word == ">=") return TCF_GREATER_EQUAL;
 	if (word == "<=") return TCF_LESS_EQUAL;
 
-	return TCF_UNDEFINED;	
+	return TCF_UNDEFINED;
 }
 
 
 void Script :: processFieldOcc(const FieldInfo& fieldParameters) {
 
 	ADDTOLOG2("Script :: processFieldOcc, lineNumber = %i", text -> getLineNumber());
-		
+
 	TypeCompareField typeCompareField = TCF_EQUAL;
 	//UInt sizeField;
 	RefHolder<DBuffer> valueToWrite;
@@ -2895,16 +2895,16 @@ void Script :: processFieldOcc(const FieldInfo& fieldParameters) {
 	// searches name of field (must be found)
 
 	//check(fields.search_field(fieldName, &fieldParameters));
-	
+
 	//sizeField = f.getSizeField();
 
 	//ADDTOLOG4("Script :: processFieldOcc -- sizeField = %i, pos = %i, offset = %i", sizeField, fieldParameters.pos, fieldParameters.offset);
-		
-	
+
+
 
 	// READS VALUE	(more generally condition specification)
 
-	MString value_word;
+	MessageString value_word;
 
 	try
 	{
@@ -2913,33 +2913,33 @@ void Script :: processFieldOcc(const FieldInfo& fieldParameters) {
 		read_word(value_word, true);
 
 		if ((typeCompareField = isCompareQualifier(value_word)) != TCF_UNDEFINED) {
-			
+
 			// the read word is compare qualifier
 
 			read_word(value_word, true);
 		}
-		else 
+		else
 
 			// no compare qualifier
 
 			typeCompareField = TCF_EQUAL;
 	}
-	ADD_TO_ERROR_DESCRIPTION("reading value of field");		
-			
+	ADD_TO_ERROR_DESCRIPTION("reading value of field");
+
 	if (value_word == key_words[KW_ANY].keyword) {
-					
+
 		// specified "any" as value for field
 
 		ADDTOLOG1("Script :: processFieldOcc -- empty value");
 		clearMaskValue = true;
 	}
-	
+
 	// resolves names of fields, variables, substitutionsOfValues
 
    putValuesInMessage(&value_word);
-	
+
 	searchEntity(&value_word, QP_NOT_PROCESS_QUOTES, true, false, false, SE_FIELD_VALUE);
-		
+
 	if (autocalcManager -> searchValue(!value_word) != 0) {
 
 		// processes auto calculated value
@@ -2951,7 +2951,7 @@ void Script :: processFieldOcc(const FieldInfo& fieldParameters) {
 
 		autocalcManager -> setValueAsActive(!value_word, fieldParameters);
 		buf -> setpos(fieldParameters.getPos() + fieldParameters.getSize().num());
-		
+
 		return;
 	}
 	else {
@@ -2959,7 +2959,7 @@ void Script :: processFieldOcc(const FieldInfo& fieldParameters) {
 		// reads real value
 
 		ADDTOLOG1("Script :: processFieldOcc -- reading some value");
-		
+
 		if (KW_RAND_VALUE == is_keyword(!value_word)) {
 
 			// random value
@@ -2968,14 +2968,14 @@ void Script :: processFieldOcc(const FieldInfo& fieldParameters) {
 
             throw new Exception("trying to apply random value to the field with undefined size");
          }
-			
+
          valueToWrite.set(new DBuffer());
-         UInt sizeField = fieldParameters.getSize().num();                  
+         UInt sizeField = fieldParameters.getSize().num();
          for (UInt i = 0; i < sizeField; i++) {
 
             valueToWrite.ref() -> setByte(i, (u_char)((float)rand()*255/RAND_MAX));
          }
-         
+
 		}  else  {
 
 			// common value
@@ -2990,7 +2990,7 @@ void Script :: processFieldOcc(const FieldInfo& fieldParameters) {
 			}
 		}
 	}
-	
+
 	if (!valueToWrite.ref()) valueToWrite.set(new DBuffer());
 
 	ADDTOLOG2("Script :: processFieldOcc -- size of value = %i", valueToWrite.ref() -> getSize());
@@ -3014,7 +3014,7 @@ void Script :: processFieldOcc(const FieldInfo& fieldParameters) {
 
 		// writes the value
 
-		buf -> setFieldValue(f, false);				
+		buf -> setFieldValue(f, false);
 
 		// works with autoIncrementedField
 
@@ -3033,31 +3033,31 @@ void Script :: processFieldOcc(const FieldInfo& fieldParameters) {
 		// adding the special condition  (not equality, greater than and others)
 
 		if (!clearMaskValue) {
-							
+
 			buf -> addSpecialCondition(f, typeCompareField);
 		}
 		else {
 
 			// processes the 'any' value
 
-			buf -> excludeFromMask(f);	
+			buf -> excludeFromMask(f);
 		}
 	}
 }
 
 
 
-void Script :: searchEntity(MString* name, QuotesProccessing quotesProccessing, bool withTypeInfo, bool doNotResolve, bool checkNotResolvedName, TypeOfEntity typeOfEntity) {
+void Script :: searchEntity(MessageString* name, QuotesProccessing quotesProccessing, bool withTypeInfo, bool doNotResolve, bool checkNotResolvedName, TypeOfEntity typeOfEntity) {
 
-	FieldVariableValue* var;	
-	MString initName = *name;
+	FieldVariableValue* var;
+	MessageString initName = *name;
 	bool found = false;
 
 	const char* s;
 
 	if (!doNotResolve) {
 
-		// searches amoung some key words - special values	
+		// searches amoung some key words - special values
 
 		if (!found && *name == key_words[KW_CURTIME].keyword) {
 
@@ -3070,7 +3070,7 @@ void Script :: searchEntity(MString* name, QuotesProccessing quotesProccessing, 
 
 //			name -> resize(30);
 //			name -> resize(snprintf((char*)name -> c_str(), 30, "%02u:%02u:%02u.%03u", systemTime.wHour, systemTime.wMinute, systemTime.wSecond, systemTime.wMilliseconds));
-         
+
          s.width(2);
          s << systemTime.wHour << ":";
          s.width(2);
@@ -3079,7 +3079,7 @@ void Script :: searchEntity(MString* name, QuotesProccessing quotesProccessing, 
          s << systemTime.wSecond << ":";
          s.width(2);
          s << systemTime.wMilliseconds;
-         
+
 	#else
 			time_t t;
 			struct tm* tmp;
@@ -3146,51 +3146,51 @@ void Script :: searchEntity(MString* name, QuotesProccessing quotesProccessing, 
          ostringstream s;
          s << (UInt)buf -> getCurrentSize();
 			*name = s.str();
-			
+
 			found = true;
 		}
-      
+
       if (!found && *name == key_words[KW_RAND_VALUE].keyword && typeOfEntity != SE_FIELD_VALUE) {
 
          ostringstream s;
          s << (u_int)((float)rand()*255/RAND_MAX);
 			*name = s.str();
-			
+
 			found = true;
 		}
 
 	}
 
 	bool entityAlreadyExists = false;
-	
+
 	// searches amoung defines
-			
+
 	UInt numRecord;
 	if (!found && (s = defines.search_value(!(*name)))) {
-		
+
 		*name = s;
 		//if (!withTypeInfo) StresstestTextBuffer :: removeEnclosingCommas(name);
-		
+
 		found = true;
-		
+
 		if (typeOfEntity != SE_SUBSTITUTION) {
 			entityAlreadyExists = true;
 		}
 
       // TODO[at] fix infinite recursive call error when 'gdef hh hh'
       searchEntity(name, QP_NOT_PROCESS_QUOTES, true, false, false );
-      
+
       putValuesInMessage(name);
-      
+
 	}
 
 	// searches amoung global defines
-		
+
 	if (!found && (s = globalDefines.search_value(!(*name)))) {
 
 		*name = s;
 		//if (!withTypeInfo) StresstestTextBuffer :: removeEnclosingCommas(name);
-		
+
 		found = true;
 
 		if (typeOfEntity != SE_GLOBAL_SUBSTITUTION) {
@@ -3199,9 +3199,9 @@ void Script :: searchEntity(MString* name, QuotesProccessing quotesProccessing, 
 		}
 
       searchEntity(name, QP_NOT_PROCESS_QUOTES, true, false, false );
-      
+
       putValuesInMessage(name);
-      
+
 	}
 
 //   if (found && )
@@ -3210,15 +3210,15 @@ void Script :: searchEntity(MString* name, QuotesProccessing quotesProccessing, 
 
 	var = variables.getVariable(!(*name), false, &numRecord);
 	if (!found && var) {
-				 
-		*name = var -> getValue().getValueString(withTypeInfo);		
-		
+
+		*name = var -> getValue().getValueString(withTypeInfo);
+
 		found = true;
 
 		if (typeOfEntity != SE_VARIABLE) {
 			entityAlreadyExists = true;
 		}
-	}	
+	}
 
 	// searches amoung field's names
 
@@ -3232,14 +3232,14 @@ void Script :: searchEntity(MString* name, QuotesProccessing quotesProccessing, 
 			if (var.setByPacket(!(buf -> getPacketSpecial() -> getContentOfPacket()), buf -> getCurrentSize()) != ICR_OK) {
 
 				throw new Exception("unable to get value for field '%s', packet's size = %i, may be it's less than field's position + field's size", !(*name), buf -> getCurrentSize());
-			}			
+			}
 			*name = var.getValueString(withTypeInfo);
 
 			ADDTOLOG2("value of field=%s",name -> c_str());
 		}
-		
+
 		found = true;
-		
+
 		if (typeOfEntity == SE_FIELD)
 
 			fields.deleteRecord(numRecord);
@@ -3248,9 +3248,9 @@ void Script :: searchEntity(MString* name, QuotesProccessing quotesProccessing, 
 
 			entityAlreadyExists = true;
 		}
-	}		
+	}
 
-	if (entityAlreadyExists 
+	if (entityAlreadyExists
 		 && (typeOfEntity == SE_FIELD || typeOfEntity == SE_GLOBAL_SUBSTITUTION
 		    || typeOfEntity == SE_SUBSTITUTION || typeOfEntity == SE_VARIABLE
 			 )
@@ -3269,7 +3269,7 @@ void Script :: searchEntity(MString* name, QuotesProccessing quotesProccessing, 
 
 		bool thisIsNumber = true;
 
-		// checks is the string number (for numbers 'readValueUndefinedType' assumes 1 byte size, 
+		// checks is the string number (for numbers 'readValueUndefinedType' assumes 1 byte size,
 		//										  for big numbers this may cause error, so if it is any number => dont call readValueUndefinedType)
 
 		try
@@ -3279,7 +3279,7 @@ void Script :: searchEntity(MString* name, QuotesProccessing quotesProccessing, 
 		catch (Exception* e) {
 
 			delete e;
-			thisIsNumber = false;			
+			thisIsNumber = false;
 		}
 
 		// checks does the string correspond any value's type
@@ -3310,8 +3310,8 @@ void Script :: searchEntity(MString* name, QuotesProccessing quotesProccessing, 
 void Script :: processARepMakerCommand() {
 
 	CommonField* field = Null;
-	MString fieldName;
-	MString value;
+	MessageString fieldName;
+	MessageString value;
 
 	try
 	{
@@ -3340,22 +3340,22 @@ void Script :: setMainInterfaceNum(int num) {
 		ras -> setNoInitDefaults();
 	}
 	else {
-		check(num < dev -> numOpenedInterfaces());		
+		check(num < dev -> numOpenedInterfaces());
 		ras -> setCommonDefaults(num);
 		buf -> updateUponInterfaceChange(dev -> getInterface(num));
 		fields.setPositionOfField(DATA_FIELD, dev -> getInterface(num) -> getDevice() -> getPositionDataBegins());
 	}
 }
 
-void Script :: putValuesInMessage(MString* message) {
+void Script :: putValuesInMessage(MessageString* message) {
 
-	MString resultMessage;
-	MString nameOfItem;
-	MString valueString;
+	MessageString resultMessage;
+	MessageString nameOfItem;
+	MessageString valueString;
 
    if (!StresstestTextBuffer :: isEnclosedInApostrophes(*message))
       return;
-	
+
 	uint si = 0;
 	uint di = 0;
 	for (; si < message -> size(); ) {
@@ -3370,10 +3370,10 @@ void Script :: putValuesInMessage(MString* message) {
 
 				//bool found = false;
 				nameOfItem = *message;
-				
-				nameOfItem.erase(0, posFirstDollar + 1);				
+
+				nameOfItem.erase(0, posFirstDollar + 1);
 				nameOfItem.erase(si - posFirstDollar - 1, nameOfItem.size() - (si - posFirstDollar - 1));
-																																				  
+
 				valueString = nameOfItem;
 
 //				const char* c;
@@ -3385,10 +3385,10 @@ void Script :: putValuesInMessage(MString* message) {
 				searchEntity(&valueString, QP_REMOVE_OPTIONAL_QUOTES, false);
 
 				resultMessage.insert(di, valueString);
-				di += valueString.size();				
+				di += valueString.size();
 
 				si++;
-				continue;				
+				continue;
 			}
 			else {
 
@@ -3396,7 +3396,7 @@ void Script :: putValuesInMessage(MString* message) {
 					si = posFirstDollar;
 			}
 		}
-				
+
 		resultMessage.resize(di + 1);
 		resultMessage.at(di) = (*message)[si];
 		si++;
@@ -3409,10 +3409,10 @@ void Script :: putValuesInMessage(MString* message) {
 
 
 const char* Script :: getKeyWord(int kwID) {
-	
+
 	return key_words[kwID].keyword;
 }
-											 
+
 int is_keyword(const char* word) {
 
    int i;
@@ -3423,7 +3423,7 @@ int is_keyword(const char* word) {
 }
 
 
-void printKeyWordInfo(const MString& keyword) {
+void printKeyWordInfo(const MessageString& keyword) {
 
 	for (UInt i = 0; key_words[i].keyword; i++) {
 
@@ -3438,7 +3438,7 @@ void printKeyWordInfo(const MString& keyword) {
 }
 
 
-int Script :: readEntity(MString* word,
+int Script :: readEntity(MessageString* word,
    bool failOnKeyword,
    bool failOnEmptyWord, // true: if reads some key word then throws Exception
    QuotesProccessing quotesProccessing,

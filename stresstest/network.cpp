@@ -59,13 +59,13 @@ void Network :: setDevices(vector<Device*> givenDevices) {
 	devices.assign(givenDevices.begin(), givenDevices.end());
 }
 
-void Network :: openInterface(const string& device, const MString& name) {
+void Network :: openInterface(const string& device, const MessageString& name) {
 
    for (int i = 0; i < devices.size(); i++) {
       if (device == devices[i] -> gettype()) {
 			stringstream ss(name);
-			MString specName;
-			MString uniqueName;
+			MessageString specName;
+			MessageString uniqueName;
 			getline(ss, specName, '#');
 			getline(ss, uniqueName, '#');
          Interface* in = devices[i] -> newInterface(specName);
@@ -75,7 +75,7 @@ void Network :: openInterface(const string& device, const MString& name) {
 			else {
 				char n[10];
 				sprintf(n,"%u",interf.size());
-				MString un(n);
+				MessageString un(n);
 				in -> setUniqueName(un);
 			}
          in -> setDevice(devices[i]);
@@ -87,7 +87,7 @@ void Network :: openInterface(const string& device, const MString& name) {
    throw new Exception("device with name '%s' is not found", device.c_str());
 }
 
-uint Network :: closeInterface(const MString& name) {
+uint Network :: closeInterface(const MessageString& name) {
    uint n = getInterfaceNumberByName(name, true);
    Interface* i = getInterface(n);
    i -> close();
@@ -226,12 +226,12 @@ int Network :: get_device_num(int index) {
    return index;
 }
 
-const MString Network :: getNameOfInterface(UInt interfaceNum) {
+const MessageString Network :: getNameOfInterface(UInt interfaceNum) {
 
 	check(interfaceNum < interf.size());
 	return interf.at(interfaceNum) -> getUniqueName();
-//	MString name = interf.at(interfaceNum) -> getName();
-//   MString uName = interf.at(interfaceNum) -> getUniqueName();
+//	MessageString name = interf.at(interfaceNum) -> getName();
+//   MessageString uName = interf.at(interfaceNum) -> getUniqueName();
 //	if (!uName.empty()) {
 //		name.append("#");
 //		name.append(uName);
@@ -239,10 +239,10 @@ const MString Network :: getNameOfInterface(UInt interfaceNum) {
 //	return name;
 }
 
-UInt Network :: getInterfaceNumberByName(const MString& name, bool failOnNotFound) {
+UInt Network :: getInterfaceNumberByName(const MessageString& name, bool failOnNotFound) {
 
 	for (int i = 0; i < interf.size(); i++) {
-		MString compoundName = interf[i] -> getName();
+		MessageString compoundName = interf[i] -> getName();
 		compoundName.append("#");
 		compoundName.append(interf[i] -> getUniqueName());
 		if (interf[i] -> getName() == name || interf[i] -> getUniqueName() == name || compoundName == name) {
@@ -376,7 +376,7 @@ void EthDevice :: init() {
 
 
 
-EthInterface :: EthInterface(const MString& devname_t, const EthDevice& device) : Interface(devname_t) {
+EthInterface :: EthInterface(const MessageString& devname_t, const EthDevice& device) : Interface(devname_t) {
 
 	pcap_if_t *d;
 	pcap_t *fp;
@@ -389,7 +389,7 @@ EthInterface :: EthInterface(const MString& devname_t, const EthDevice& device) 
 //	char* devname = (char*)malloc(strlen(devname_t) + 1);
 //	memCheck(devname);
 //	strcpy(devname, devname_t);
-   MString devname = devname_t;
+   MessageString devname = devname_t;
 
 		// searches symbol # in given name, if finds then cuts the name of interface
 
@@ -730,7 +730,7 @@ void IPDevice :: init () {
 #endif
 
 #ifdef WIN32
-IPInterface :: IPInterface(const MString& name) : Interface(name) {
+IPInterface :: IPInterface(const MessageString& name) : Interface(name) {
 
    IPDevice :: init();
 
@@ -741,7 +741,7 @@ IPInterface :: IPInterface(const MString& name) : Interface(name) {
 //   char* devname = (char*)malloc(strlen(name)+1);
 //	memCheck(devname);
 //	strcpy(devname, name);
-   MString devname = name;
+   MessageString devname = name;
    SOCKET s;
 
 	try
@@ -825,7 +825,7 @@ IPInterface :: IPInterface(const MString& name) : Interface(name) {
 
 }
 #else
-IPInterface :: IPInterface(const MString& name) : Interface(name) {
+IPInterface :: IPInterface(const MessageString& name) : Interface(name) {
 
 	hostent* h;
 	sockaddr_in target;
@@ -1051,9 +1051,9 @@ void IPInterface :: stopTraceInt () {
 
 void SocketInterface :: open() {
 
-	const MString name = getName();
+	const MessageString name = getName();
 	bool serverMode = false;
-   MString name1 = name;
+   MessageString name1 = name;
 	try
 	{
 		stringstream ss(!name1);

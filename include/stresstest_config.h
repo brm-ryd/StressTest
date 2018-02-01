@@ -14,7 +14,7 @@ class StresstestConfig {
 
    char* base_path;
    char* def_device;
-   MString dev_type;
+   MessageString dev_type;
 
  public:
 
@@ -24,9 +24,8 @@ class StresstestConfig {
    void read ();
    const char* get_base_path();
    const char* get_def_device();
-   const MString& get_device_type();
+   const MessageString& get_device_type();
 };
 
 
 #endif  // CONFIG_H
-

@@ -1,5 +1,5 @@
 #include "exceptions.h"
-#include "mstring.h"
+#include "messagestring.h"
 #include "messagebuff.h"
 #pragma once
 
@@ -17,7 +17,7 @@ class FileWorker : public DBuffer
 {
 
 public:
-	MString nameOfLoadedFile;
+	MessageString nameOfLoadedFile;
 
 public:
 	FileWorker(void);
@@ -25,5 +25,5 @@ public:
 
 	virtual void load(const char* filename) throw(Exception*);
 	void save(const char* filename = 0) throw(Exception*);
-	//const MString& getNameOfFile();
+	//const MessageString& getNameOfFile();
 };

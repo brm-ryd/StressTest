@@ -877,7 +877,7 @@ void ConvtestResult :: setByString(
 
    bool isRange = false;
    UInt lastPacNum = (UInt)-1;
-   MString s;
+   MessageString s;
    const char* c;
    const char* lc;
    const char* comma;
