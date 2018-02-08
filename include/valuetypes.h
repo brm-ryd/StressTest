@@ -11,7 +11,7 @@
 #define ISDIG(x) (x>=0x30 && x<=0x39)
 
 extern const TCHAR* MUST_BE_QUOTED_ERROR;
-class AnettestTextBuffer;
+class StresstestTextBuffer;
 
 /**
  * Holds and deletes given reference in destructor. Helps to avoid memory leaks.

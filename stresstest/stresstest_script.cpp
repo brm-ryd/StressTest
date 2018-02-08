@@ -10,7 +10,7 @@
 #define MAIN_INTERFACE_NOT_SET (-1)
 #define WORD_SIZE 1600
 
-// key words (ATTENTION: must correspond to KW_ enumeration)
+// key words - correspond to KW_ enumeration
 KeyWordsInfo key_words[]=
 {
  {"SEND","{accept | drop | any }","In common regime generates the packet defined above. In other regimes (testing packet filter, see command FASTTEST and option -c) may simply separate packets one from another, so by this command the current content of buffer will be fixed and the new packet will be registered. The requests after command don't make sense in common regime (only while testing packet filter)."},
@@ -126,9 +126,7 @@ KeyWordsInfo key_words[]=
  {0,0,0}
 };
 
-/********************************************************************
-***********************	Class Script ********************************
-********************************************************************/
+/* Class Script */
 
 void Script :: add_include_path(const char* path) throw(Exception*) {
 
@@ -143,7 +141,7 @@ void Script :: setCommandProcessors(vector<CommandsProcessor*> givenCommandProce
 Script :: Script(Network& device, ReqAndStat& externRas, TraceFile& traceFile, AutocalcManager& autocalcManager, u_char regime)
 {
 
-	// ATTENTION: most of parameters must be also initialized in method 'reset'
+	// most of parameters must be also initialized in method 'reset'
 
    this -> autocalcManager = &autocalcManager;
 
