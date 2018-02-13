@@ -11,7 +11,7 @@ Script* Testing :: scr = NULL;
 void Testing :: runAllTests() {
 	try
 	{
-		//cout << "Self-testing...\n";
+		cout << "Self-testing...\n";
 		StresstestConfig conf;
 		conf.read();
 
@@ -36,28 +36,28 @@ void Testing :: runAllTests() {
 		scr = &globalScript;
 		scr -> reset(SR_GEN);
 		test1();
-		//cout << "Test1 is finished\n";
+		cout << "Test1 is finished\n";
 		scr -> reset(SR_GEN);
 		test2();
-		//cout << "Test2 is finished\n";
+		cout << "Test2 is finished\n";
 		scr -> reset(SR_GEN);
 		test3();
-		//cout << "Test3 is finished\n";
+		cout << "Test3 is finished\n";
 		scr -> reset(SR_GEN);
 		test4();
-		//cout << "Test4 is finished\n";
+		cout << "Test4 is finished\n";
 		scr -> reset(SR_GEN);
 		test5();
-		//cout << "Test5 is finished\n";
+		cout << "Test5 is finished\n";
 		scr -> reset(SR_GEN);
 		fieldValueTest();
-		//cout << "Test5 is finished\n";
+		cout << "Test5 is finished\n";
 		scr -> reset(SR_GEN);
 		testShortVarDefines();
 
 		DBuffer :: test();
 
-		//cout << "Self-test is finished successfully\n";
+		cout << "Self-test is finished successfully\n";
 	}
 	catch (Exception* e) {
 
