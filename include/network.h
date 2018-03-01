@@ -46,8 +46,8 @@ typedef int SOCKET;
  handler of packets of data,
  returns 0 if tracing must be continued, otherwise 1
 */
-typedef int (*stresstest_packet_handler)(u_char*, // packet's content
-	//struct timeval, // packet's time
+typedef int (*stresstest_packet_handler)(u_char*, // packets content
+	//struct timeval, // packets time
 	//int caplen,		 // stored part of content (lenght of pkt_data)
 	u_int len,			 // size of packet
 	void*);			 // additional user info (given while tracing initialization)
